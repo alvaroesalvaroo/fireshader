@@ -1,0 +1,50 @@
+//
+// Created by alv18 on 27/04/2025.
+//
+
+#include "Shader.h"
+#include <sstream>	// For stringstream
+#include <fstream>  // For ifstream
+
+Shader::Shader() {
+    mProgramID = glCreateProgram();
+    mAllOK = true;
+}
+Shader::~Shader() {
+    glDeleteProgram(mProgramID);
+    mAllOK = false;
+}
+
+
+char Shader::*loadShaderFromFile(const char *filepath) {
+    std::ifstream file(filepath);
+    if (!file.is_open()) {
+        printf("Error al abrir el archivo de shader: %s\n", filepath);
+        return nullptr;
+    }
+    std::stringstream shaderStream;
+    shaderStream << file.rdbuf();  // Leer todo el contenido del archivo en el stringstream
+
+    std::string shaderString = shaderStream.str();
+    char *shaderChar = new char[shaderString.length() + 1];
+    strcpy(shaderChar, shaderString.c_str());
+    return shaderChar;  // Devolver el contenido como un std::string
+}
+
+void Shader::loadVertexShader(const char *filepath) {
+    char *source = loadShaderFromFile(filepath);
+}
+
+void Shader::Use() {
+    if (mAllOK)
+        glUseProgram (mProgramID);
+}
+
+void Shader::deleteProgram() {
+    if (mAllOK)
+        glDeleteProgram(mProgramID);
+}
+
+GLuint Shader::getID () {
+    return mProgramID;
+}

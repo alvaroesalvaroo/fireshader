@@ -1,0 +1,30 @@
+//
+// Created by alv18 on 27/04/2025.
+//
+
+#ifndef SHADERS_H
+#define SHADERS_H
+#define SHADERS_SOURCE_DIR "Shaders/"
+#include <GL/gl.h>
+#include <glad/glad.h>
+
+class Shader {
+    public:
+        Shader (const char *filepath);
+        ~Shader (const char *filepath);
+        //void init ( const GLchar *filename);
+        GLuint getID ();
+        void Use ();
+        void deleteProgram ();
+        char *loadShaderFromFile(const char *filepath);
+        void loadVertexShader(const char *filepath);
+        void loadFragmentShader(const char *filepath);
+    private:
+        GLuint mProgramID;
+        bool mAllOK;
+
+};
+
+
+
+#endif //SHADERS_H

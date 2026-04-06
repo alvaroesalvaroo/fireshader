@@ -6,7 +6,7 @@
 
 #pragma once
 #include "GameLevel.h"
-#include "Scene.h"
+#include "../../src/Scene.h"
 #include "../GameObjects/BallObject.h"
 #include "../GameObjects/ParticleGenerator.h"
 #include "../GameObjects/PowerUp.h"
@@ -33,10 +33,6 @@ typedef std::tuple<bool, Direction, glm::vec2> Collision; // <collision?, what d
 class Game : public Scene
 {
 public:
-    // Game state
-    GameState State;
-    unsigned int Lives;
-
 
     GLuint Width, Height;
     // Constructor/Destructor
@@ -51,21 +47,8 @@ public:
     void ProcessInput(GLfloat dt) override;
     void Render() override;
 
-    std::vector<PowerUp>  PowerUps;
-
-
-
-    void UpdatePowerUps(float dt);
-
-
-
-    // Collisions
-    void DoCollisions();
-
 protected:
-    virtual void LoadLevels();
 
-    virtual void InitPlayerAndBall();
 
     virtual void DrawPlayerAndBall();
     virtual void DrawMenuText();

@@ -9,19 +9,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "GameLogic/Game.h"
 #include "ResourceManager.h"
 
 #include <iostream>
 
 #include "ResourceManager.h"
 #include <SDL.h>
+#include <vector>
 
 #include "AudioEngine.h"
-#include "GameLogic/Selector.h"
-#include "GameLogic/TwoPlayersGame.h"
+#include "Scene.h"
 
-#define TWO_PLAYERS_GAME
+#include "CubesTestingScene.h"
 
 bool initGL();
 // GLFW function declarations
@@ -48,13 +47,13 @@ int main(int argc, char *argv[])
     if (!AudioEngine::Init()) {
         return -1;
     }
-    AudioEngine::LoadMusic("music", "assets/audio/electroswingLoop.mp3");
-    AudioEngine::SetMusicVolume(60);    // from 0 to 128
-    AudioEngine::PlayMusic("music", -1); // Play music on loop
+    // AudioEngine::LoadMusic("music", "assets/audio/electroswingLoop.mp3");
+    // AudioEngine::SetMusicVolume(60);    // from 0 to 128
+    // AudioEngine::PlayMusic("music", -1); // Play music on loop
 
-    // initialize game
+    // initialize scene
     // ---------------
-    Scene::ChangeScene(new Selector(SCREEN_WIDTH, SCREEN_HEIGHT));
+    Scene::ChangeScene(new CubesTestingScene(SCREEN_WIDTH, SCREEN_HEIGHT));
 
     Scene::CurrentScene->Init();
 
@@ -79,7 +78,7 @@ int main(int argc, char *argv[])
         // -----------------
         Scene::CurrentScene->ProcessInput(deltaTime);
 
-        // update game state
+        // update scene state
         // -----------------
         Scene::CurrentScene->Update(deltaTime);
 

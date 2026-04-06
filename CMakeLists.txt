@@ -39,9 +39,10 @@ set(FREETYPE_LIB_PATH "${CMAKE_SOURCE_DIR}/freetype/lib/win64/freetype.lib")
 add_library(freetype STATIC IMPORTED)
 set_target_properties(freetype PROPERTIES IMPORTED_LOCATION ${FREETYPE_LIB_PATH})
 
-set(SOURCE_FILES src/GameLogic/Game.cpp
-        src/GameLogic/Game.h
+set(SOURCE_FILES
         src/main.cpp
+        src/Camera3D.h
+        src/Camera3D.cpp
         src/resources.rc
         glad/src/glad.c
         src/Rendering/Shader.cpp
@@ -53,27 +54,18 @@ set(SOURCE_FILES src/GameLogic/Game.cpp
         src/Rendering/stb_image.h
         src/Rendering/SpriteRenderer.cpp
         src/Rendering/SpriteRenderer.h
-        src/GameObjects/GameObject2D.cpp
-        src/GameObjects/GameObject2D.h
-        src/GameLogic/GameLevel.cpp
-        src/GameLogic/GameLevel.h
-        src/GameObjects/BallObject.cpp
-        src/GameObjects/BallObject.h
-        src/GameObjects/ParticleGenerator.cpp
-        src/GameObjects/ParticleGenerator.h
         src/Rendering/PostProcessor.cpp
         src/Rendering/PostProcessor.h
-        src/GameObjects/PowerUp.h
         src/AudioEngine.cpp
         src/AudioEngine.h
         src/Rendering/TextRenderer.cpp
         src/Rendering/TextRenderer.h
-        src/GameLogic/TwoPlayersGame.cpp
-        src/GameLogic/TwoPlayersGame.h
-        src/GameLogic/TwoPlayersLevel.cpp
-        src/GameLogic/TwoPlayersLevel.h
-        src/GameLogic/Selector.cpp
-        src/GameLogic/Selector.h
+        src/CubesTestingScene.h
+        src/CubesTestingScene.cpp
+        3DOldProject/Objects/Object3D.h
+        3DOldProject/Objects/LitCube.cpp
+
+
 )
 
 
@@ -115,7 +107,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 # glm included here
 include_directories(glm/glm)
 include_directories(glm/glm/gtx) # useful for to_string
-
+include_directories(src)
+include_directories(src/Rendering)
 # also source files
 include_directories(${CMAKE_SOURCE_DIR}/src)
 

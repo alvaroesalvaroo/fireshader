@@ -15,17 +15,7 @@
 #include "Rendering/Texture.h"
 #include "Rendering/Shader.h"
 
-enum class TextureName {
-    Block, BlockSolid,
-    Background,
-    Paddle, VerticalPaddle,
-    Ball, Particle,
-    PowerSpeed, PowerSticky, PowerIncrease, PowerConfuse, PowerChaos, PowerPassthrough,
-    Arrows, Game1P, Game2P
-};
-enum class ShaderName {
-    Sprite, Particle, PostProcess, Text
-};
+
 
 
 // A static singleton ResourceManager class that hosts several
@@ -37,16 +27,16 @@ class ResourceManager
 {
 public:
     // resource storage
-    static std::map<ShaderName, Shader>    Shaders;
-    static std::map<TextureName, Texture2D> Textures;
+    static std::map<const char*, Shader>    Shaders;
+    static std::map<const char*, Texture2D> Textures;
     // loads (and generates) a shader program from file loading vertex, fragment (and geometry) shader's source code. If gShaderFile is not nullptr, it also loads a geometry shader
-    static Shader &LoadShader(ShaderName name);
+    static Shader &LoadShader(const char* name, const char* vertexPath, const char* fragmentPath);
     // retrieves a stored sader
-    static Shader    GetShader(ShaderName name);
+    static Shader    GetShader(const char* name);
     // loads (and generates) a texture from file
-    static Texture2D LoadTexture(TextureName name);
+    static Texture2D LoadTexture(const char* name, const char* path);
     // retrieves a stored texture
-    static Texture2D &GetTexture(TextureName name);
+    static Texture2D &GetTexture(const char* name);
     // properly de-allocates all loaded resources
     static void      Clear();
 private:

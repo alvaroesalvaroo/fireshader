@@ -8,98 +8,32 @@
 #include <fstream>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "Rendering/stb_image.h"
+#include "stb_image.h"
 
 // Instantiate static variables
-std::map<TextureName, Texture2D>    ResourceManager::Textures;
-std::map<ShaderName, Shader>       ResourceManager::Shaders;
+std::map<const char*, Texture2D>    ResourceManager::Textures;
+std::map<const char*, Shader>       ResourceManager::Shaders;
 
 
-Shader &ResourceManager::LoadShader(ShaderName name)
+Shader &ResourceManager::LoadShader(const char* name, const char* vertexPath, const char* fragmentPath)
 {
-    switch (name) {
-        case ShaderName::Sprite:
-            Shaders[name] = loadShaderFromFile("assets/shaders/sprite.vs", "assets/shaders/sprite.fs", nullptr);
-            return Shaders[name];
-        case ShaderName::Particle:
-            Shaders[name] = loadShaderFromFile("assets/shaders/particle.vs", "assets/shaders/particle.fs", nullptr);
-            return Shaders[name];
-        case ShaderName::PostProcess:
-            Shaders[name] = loadShaderFromFile("assets/shaders/postprocess.vs", "assets/shaders/postprocess.fs", nullptr);
-            return Shaders[name];
-        case ShaderName::Text:
-            Shaders[name] = loadShaderFromFile("assets/shaders/text_2d.vs", "assets/shaders/text_2d.fs", nullptr);
-            return Shaders[name];
-
-        default:
-            return Shaders[name];
-    }
+    Shaders[name] = loadShaderFromFile(vertexPath, fragmentPath, nullptr);
+    return Shaders[name];
 }
 
-Shader ResourceManager::GetShader(ShaderName name)
+Shader ResourceManager::GetShader(const char* name)
 {
     return Shaders[name];
 }
 
-Texture2D ResourceManager::LoadTexture(TextureName name)
+Texture2D ResourceManager::LoadTexture(const char* name, const char* path)
 {
-    switch (name) {
 
-        case TextureName::Block:
-            Textures[name] = loadTextureFromFile("assets/textures/block.png", false);
-            return Textures[name];
-        case TextureName::BlockSolid:
-            Textures[name] = loadTextureFromFile("assets/textures/block_solid.png", false);
-            return Textures[name];
-        case TextureName::Background:
-            Textures[name] = loadTextureFromFile("assets/textures/background.jpg", false);
-            return Textures[name];
-        case TextureName::Paddle:
-            Textures[name] = loadTextureFromFile("assets/textures/paddle.png", true);
-            return Textures[name];
-        case TextureName::VerticalPaddle:
-            Textures[name] = loadTextureFromFile("assets/textures/paddle-vertical.png", true);
-            return Textures[name];
-        case TextureName::Ball:
-            Textures[name] = loadTextureFromFile("assets/textures/awesomeface.png", true);
-            return Textures[name];
-        case TextureName::Particle:
-            Textures[name] = loadTextureFromFile("assets/textures/particle.png", true);
-            return Textures[name];
-        case TextureName::PowerSpeed:
-            Textures[name] = loadTextureFromFile("assets/textures/powerup_speed.png", true);
-            return Textures[name];
-        case TextureName::PowerSticky:
-            Textures[name] = loadTextureFromFile("assets/textures/powerup_sticky.png", true);
-            return Textures[name];
-        case TextureName::PowerIncrease:
-            Textures[name] = loadTextureFromFile("assets/textures/powerup_increase.png", true);
-            return Textures[name];
-        case TextureName::PowerConfuse:
-            Textures[name] = loadTextureFromFile("assets/textures/powerup_confuse.png", true);
-            return Textures[name];
-        case TextureName::PowerChaos:
-            Textures[name] = loadTextureFromFile("assets/textures/powerup_chaos.png", true);
-            return Textures[name];
-        case TextureName::PowerPassthrough:
-            Textures[name] = loadTextureFromFile("assets/textures/powerup_passthrough.png", true);
-            return Textures[name];
-        case TextureName::Arrows:
-            Textures[name] = loadTextureFromFile("assets/textures/arrows.png", true);
-            return Textures[name];
-        case TextureName::Game1P:
-            Textures[name] = loadTextureFromFile("assets/textures/Game1P.png", true);
-            return Textures[name];
-        case TextureName::Game2P:
-            Textures[name] = loadTextureFromFile("assets/textures/Game2P.png", true);
-            return Textures[name];
+    Textures[name] = loadTextureFromFile(path, false);
 
-        default:
-            return Textures[name];
-    }
 }
 
-Texture2D &ResourceManager::GetTexture(TextureName name)
+Texture2D &ResourceManager::GetTexture(const char* name)
 {
     return Textures[name];
 }
@@ -147,7 +81,7 @@ Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *
     }
     catch (std::exception e)
     {
-        std::cout << "ERROR::SHADER: Failed to read shader files" << std::endl;
+        std::cerr << "ERROR::SHADER: Failed to read shader files " << e.what() << std::endl;
     }
     const char *vShaderCode = vertexCode.c_str();
     const char *fShaderCode = fragmentCode.c_str();

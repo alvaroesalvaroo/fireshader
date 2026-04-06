@@ -10,19 +10,12 @@
 #include <iostream>
 #include <ostream>
 
-#include "../AudioEngine.h"
-#include "Game.h"
-
-#include "Selector.h"
-#include "../ResourceManager.h"
+#include "AudioEngine.h"
+#include "Scene.h"
+#include "ResourceManager.h"
 #include "../Rendering/SpriteRenderer.h"
 #include "../GameObjects/BallObject.h"
-#include "../GameObjects/BallObject.h"
-#include "../GameObjects/BallObject.h"
-#include "../GameObjects/BallObject.h"
-#include "../GameObjects/BallObject.h"
-#include "../GameObjects/BallObject.h"
-#include "../GameObjects/BallObject.h"
+
 #include "../GameObjects/ParticleGenerator.h"
 #include "GLFW/glfw3.h"
 #include "../Rendering/PostProcessor.h"

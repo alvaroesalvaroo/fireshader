@@ -27,6 +27,9 @@ public:
     Shader() { }
     // sets the current shader as active
     Shader  &Use();
+
+    // TODO: check if this is needed
+    inline unsigned int getID() {return this->ID;}
     // compiles the shader from given source code
     void    Compile(const char *vertexSource, const char *fragmentSource, const char *geometrySource = nullptr); // note: geometry source code is optional
     // utility functions

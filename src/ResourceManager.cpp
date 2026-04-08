@@ -11,26 +11,38 @@
 #include "stb_image.h"
 
 // Instantiate static variables
-std::map<const char*, Texture2D>    ResourceManager::Textures;
-std::map<const char*, Shader>       ResourceManager::Shaders;
+std::map<std::string, Texture2D>    ResourceManager::Textures;
+std::map<std::string, Shader>       ResourceManager::Shaders;
 
 
-Shader &ResourceManager::LoadShader(const char* name, const char* vertexPath, const char* fragmentPath)
+Shader &ResourceManager::LoadShader(std::string name)
 {
+    // First, checkout if is already loaded
+    auto it = Shaders.find(name);
+    if (it != Shaders.end()) {
+        return it->second; // it->second es el objeto Shader
+    }
+    std::cout << "Loading shaders: " << name << std::endl;
+
+    std::string vPathStr = "shaders/" + name + ".vs";
+    std::string fPathStr = "shaders/" + name + ".fs";
+
+    // Cast String -> const char*
+    const char* vertexPath = vPathStr.c_str();
+    const char* fragmentPath = fPathStr.c_str();
     Shaders[name] = loadShaderFromFile(vertexPath, fragmentPath, nullptr);
+    Shaders[name].mName = name.c_str();
     return Shaders[name];
 }
 
-Shader ResourceManager::GetShader(const char* name)
+Shader ResourceManager::GetShader(std::string name)
 {
     return Shaders[name];
 }
 
 Texture2D ResourceManager::LoadTexture(const char* name, const char* path)
 {
-
     Textures[name] = loadTextureFromFile(path, false);
-
 }
 
 Texture2D &ResourceManager::GetTexture(const char* name)
@@ -48,7 +60,7 @@ void ResourceManager::Clear()
         glDeleteTextures(1, &pair.second.ID);
 }
 
-Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile)
+Shader ResourceManager::loadShaderFromFile(std::string vShaderFile, std::string fShaderFile, const char *gShaderFile)
 {
     // 1. retrieve the vertex/fragment source code from filePath
     std::string vertexCode;
@@ -66,20 +78,24 @@ Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *
         // close file handlers
         vertexShaderFile.close();
         fragmentShaderFile.close();
+
         // convert stream into string
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
-        // if geometry shader path is present, also load a geometry shader
-        if (gShaderFile != nullptr)
-        {
-            std::ifstream geometryShaderFile(gShaderFile);
-            std::stringstream gShaderStream;
-            gShaderStream << geometryShaderFile.rdbuf();
-            geometryShaderFile.close();
-            geometryCode = gShaderStream.str();
+        if (vertexCode.empty()) {
+            std::cerr << "ERROR: " << vShaderFile << " no se ha podido cargar" << std::endl;
         }
+        // if geometry shader path is present, also load a geometry shader
+        // if (gShaderFile != nullptr)
+        // {
+        //     std::ifstream geometryShaderFile(gShaderFile); // ifstream acepta const char*
+        //     std::stringstream gShaderStream;
+        //     gShaderStream << geometryShaderFile.rdbuf();
+        //     geometryShaderFile.close();
+        //     geometryCode = gShaderStream.str();
+        // }
     }
-    catch (std::exception e)
+    catch (std::exception &e)
     {
         std::cerr << "ERROR::SHADER: Failed to read shader files " << e.what() << std::endl;
     }
@@ -88,7 +104,7 @@ Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *
     const char *gShaderCode = geometryCode.c_str();
     // 2. now create shader object from source code
     Shader shader;
-    shader.Compile(vShaderCode, fShaderCode, gShaderFile != nullptr ? gShaderCode : nullptr);
+    shader.Compile(vShaderCode, fShaderCode, nullptr);
     return shader;
 }
 

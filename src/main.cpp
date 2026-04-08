@@ -57,6 +57,9 @@ int main(int argc, char *argv[])
 
     Scene::CurrentScene->Init();
 
+    GLenum err = glGetError();
+
+
     // deltaTime variables
     // -------------------
     float deltaTime = 0.0f;

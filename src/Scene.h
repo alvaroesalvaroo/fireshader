@@ -13,7 +13,7 @@ public:
             scene->Keys[i] = false;
             scene->KeysProcessed[i] = false;
         }
-        scene->Init();
+        // scene->Init();
         CurrentScene = scene;
     }
     static inline Scene* CurrentScene;

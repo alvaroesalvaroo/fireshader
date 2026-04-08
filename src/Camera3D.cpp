@@ -2,10 +2,12 @@
 // Created by alv18 on 02/05/2025.
 //
 
-#include "../src/Backup/Camera3D.h"
+#include "Camera3D.h"
 
 // Math stuff
 #include <cmath>
+#include <iostream>
+#include <ostream>
 #include <bits/stl_algo.h>
 #include <glad/glad.h>
 #include "glm.hpp"
@@ -134,7 +136,9 @@ void Camera3D::setZoom(float fov) {
 
 void Camera3D::updateViewUniform(int uniformID) {
     mViewMatrix = glm::lookAt(mCameraPos, mCameraPos + mCameraFront, mCameraUp);
+
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(mViewMatrix));
+
 }
 
 
@@ -142,7 +146,9 @@ void Camera3D::updateProjectionUniform(int uniformID) {
     float screenWidth = static_cast<float>(mScreenWidth);
     float screenHeight = static_cast<float>(mScreenHeight);
     mProjectionMatrix = glm::perspective(glm::radians(mFov), screenWidth / screenHeight, 0.1f, 100.0f);
+
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(mProjectionMatrix));
+
 }
 
 

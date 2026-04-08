@@ -23,12 +23,13 @@ class Shader
 public:
     // state
     unsigned int ID;
+    std::string mName;
     // constructor
-    Shader() { }
+    Shader() { ID = -1; mName = "";}
     // sets the current shader as active
     Shader  &Use();
 
-    // TODO: check if this is needed
+    /// prestamo de la anterior clase
     inline unsigned int getID() {return this->ID;}
     // compiles the shader from given source code
     void    Compile(const char *vertexSource, const char *fragmentSource, const char *geometrySource = nullptr); // note: geometry source code is optional

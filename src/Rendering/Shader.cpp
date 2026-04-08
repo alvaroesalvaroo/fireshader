@@ -10,6 +10,7 @@ Shader &Shader::Use()
 
 void Shader::Compile(const char* vertexSource, const char* fragmentSource, const char* geometrySource)
 {
+    this->mName = vertexSource;
     unsigned int sVertex, sFragment, gShader;
     // vertex Shader
     sVertex = glCreateShader(GL_VERTEX_SHADER);
@@ -86,7 +87,7 @@ void Shader::SetVector3f(const char *name, float x, float y, float z, bool useSh
         this->Use();
     GLint location = glGetUniformLocation(this->ID, name);
     if (location == -1) {
-        std::cerr << "Error in glGetUniformLocation of vector3: " << name <<std::endl;
+        std::cerr << "Error setting uniform of vector3: " << name << " in shader "<< this->mName <<std::endl;
     }
     glUniform3f(location, x, y, z);
 }
@@ -133,6 +134,7 @@ void Shader::SetMatrix4(const char *name, const glm::mat4 &matrix, bool useShade
 
 void Shader::checkCompileErrors(unsigned int object, std::string type)
 {
+
     int success;
     char infoLog[1024];
     if (type != "PROGRAM")

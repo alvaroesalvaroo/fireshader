@@ -62,9 +62,18 @@ set(SOURCE_FILES
         src/Rendering/TextRenderer.h
         src/CubesTestingScene.h
         src/CubesTestingScene.cpp
-        3DOldProject/Objects/Object3D.h
-        3DOldProject/Objects/LitCube.cpp
-
+        src/Object3D.h
+        src/Object3D.cpp
+#        src3DOldProject/Objects/LitCube.h
+#        src3DOldProject/Objects/LitCube.cpp
+        src/LightEmissor.h
+        src/LightEmissor.cpp
+#        src3DOldProject/Objects/TexturedUnlitCube.h
+#        src3DOldProject/Objects/TexturedUnlitCube.cpp
+#        src3DOldProject/Objects/TexturedLitPlane.h
+#        src3DOldProject/Objects/TexturedLitPlane.cpp
+        src/Mesh.cpp
+        src/Mesh.h
 
 )
 

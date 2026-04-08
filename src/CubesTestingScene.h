@@ -5,13 +5,14 @@
 #ifndef CUBESTESTINGSCENE_H
 #define CUBESTESTINGSCENE_H
 
+#include "Object3D.h"
 #include "Scene.h"
 
 // Forward declarations para evitar dependencias circulares innecesarias en el header
 class TexturedUnlitCube;
 class LitCube;
 class TexturedLitPlane;
-class LightEmissorCube;
+class LightEmissor;
 class Camera3D;
 
 class CubesTestingScene : public Scene {
@@ -30,10 +31,10 @@ private:
 
 #define NUM_CUBES 6
     Camera3D* mCamera;
-    TexturedUnlitCube* mCubes[NUM_CUBES];
-    LitCube* mLitCube;
-    TexturedLitPlane* mTexturedLitCube;
-    LightEmissorCube* mLightEmissor;
+    Object3D* mUnlitCubes[NUM_CUBES];
+    Object3D* mLitCube;
+    Object3D* mTexturedLitCube;
+    LightEmissor* mLightEmissor;
 };
 
 #endif //CUBESTESTINGSCENE_H

@@ -10,9 +10,5 @@ cmake-build-debug/*.ninja*
 cmake-build-debug/*.cmake
 cmake-build-debug/*.txt
 
-
-!cmake-build-debug/mesh/
-!cmake-build-debug/shaders/
-!cmake-build-debug/textures/
 #src3DOldProject/
 .vs/

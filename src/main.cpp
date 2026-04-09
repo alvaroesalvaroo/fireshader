@@ -26,6 +26,7 @@ bool initGL();
 // GLFW function declarations
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 
 // We declare the window as a global variable
 GLFWwindow* gWindow;
@@ -87,7 +88,7 @@ int main(int argc, char *argv[])
 
         // render
         // ------
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         Scene::CurrentScene->Render();
 
@@ -130,7 +131,7 @@ bool initGL() {
 
     gWindow = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Breakout", nullptr, nullptr);
     glfwMakeContextCurrent(gWindow);
-
+    glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     // glad: load all OpenGL function pointers
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -143,6 +144,8 @@ bool initGL() {
     glfwSwapInterval(0);
 
     glfwSetKeyCallback(gWindow, key_callback);
+    glfwSetCursorPosCallback(gWindow, mouse_callback); // <--- Esta es la del movimiento
+
     glfwSetFramebufferSizeCallback(gWindow, framebuffer_size_callback);
 
     // OpenGL configuration
@@ -169,6 +172,27 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             Scene::CurrentScene->KeysProcessed[key] = false;
         }
     }
+
+    // Mouse callba
+}
+float lastX = 400, lastY = 300;
+bool firstMouse = true;
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    // Calculamos el desplazamiento
+    Scene::CurrentScene->mouseDeltaX = xpos - lastX;
+    Scene::CurrentScene->mouseDeltaY = lastY - ypos; // Invertido porque Y va de abajo a arriba en OpenGL
+
+    lastX = xpos;
+    lastY = ypos;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

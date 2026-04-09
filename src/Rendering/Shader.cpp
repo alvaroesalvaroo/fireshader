@@ -132,6 +132,22 @@ void Shader::SetMatrix4(const char *name, const glm::mat4 &matrix, bool useShade
     glUniformMatrix4fv(location, 1, false, glm::value_ptr(matrix));
 }
 
+void Shader::SetTexture(const char *uniformName, bool useShader, GLuint channel) {
+    if (useShader)
+        this->Use();
+
+    // Buscamos la ubicación del sampler2D (ej: "textura")
+    GLint location = glGetUniformLocation(this->ID, uniformName);
+
+    if (location == -1) {
+        std::cerr << "Error in glGetUniformLocation of sampler2D: " << uniformName << std::endl;
+        return;
+    }
+
+    // Le decimos al shader: "Para este sampler, mira en la unidad de textura X"
+    glUniform1i(location, channel);
+}
+
 void Shader::checkCompileErrors(unsigned int object, std::string type)
 {
 

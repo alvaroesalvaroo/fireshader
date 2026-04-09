@@ -38,7 +38,7 @@ void Texture2D::Generate(unsigned int width, unsigned int height, unsigned char*
     GLenum error = glGetError();
     if (error != GL_NO_ERROR)
     {
-        std::cerr << "[OpenGL Error] with code : " << error << std::endl;
+        std::cerr << "[OpenGL Error] on generate texture: " << error << std::endl;
     }
 
 }

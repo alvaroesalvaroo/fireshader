@@ -40,9 +40,14 @@ Shader ResourceManager::GetShader(std::string name)
     return Shaders[name];
 }
 
-Texture2D ResourceManager::LoadTexture(const char* name, const char* path)
+Texture2D &ResourceManager::LoadTexture(const char* name, const char* path)
 {
+    auto it = Textures.find(name);
+    if (it != Textures.end()) {
+        return it->second; // it->second es el objeto Textures
+    }
     Textures[name] = loadTextureFromFile(path, false);
+    return Textures[name];
 }
 
 Texture2D &ResourceManager::GetTexture(const char* name)
@@ -108,7 +113,7 @@ Shader ResourceManager::loadShaderFromFile(std::string vShaderFile, std::string 
     return shader;
 }
 
-Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
+Texture2D ResourceManager::loadTextureFromFile(const char *path, bool alpha)
 {
     // create texture object
     Texture2D texture;
@@ -119,14 +124,14 @@ Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
     }
     // load image
     int width, height, nrChannels;
-    unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
     if (data == nullptr) {
-        std::cerr<<"Error loading texture from " << file << ". Data is null" << std::endl;
+        std::cerr<<"Error loading texture from " << path << ". Data is null" << std::endl;
     }
     // now generate texture
     texture.Generate(width, height, data);
     if (texture.ID <= 0) {
-        std::cerr<<"Error. Texture loaded from " << file << " has 0 or less ID " << std::endl;
+        std::cerr<<"Error. Texture loaded from " << path << " has 0 or less ID " << std::endl;
     }
     // and finally free image data
     stbi_image_free(data);

@@ -32,7 +32,7 @@ CubesTestingScene::CubesTestingScene(int width, int height)
     mLitCube = new Object3D();
     mTexturedLitCube = new Object3D();
     mLightEmissor = new LightEmissor();
-    mCamera = new Camera3D(0.05f, 0.001f, 45.0f);
+    mCamera = new Camera3D(2.f, 5.f, 45.0f);
 }
 
 CubesTestingScene::~CubesTestingScene() {
@@ -51,9 +51,10 @@ void CubesTestingScene::Init() {
     mCamera->setScreenSize(screenWidth, screenHeight);
     mCamera->setPosition(0.0f, 0.0f, 5.0f);
 
-    Mesh* cubeWithEBO = new Mesh();
-    cubeWithEBO->createCubeMeshWithEBO(0.75f);
     // Lot of unlited cubes
+    Mesh* cubeWithEBO = new Mesh();
+    cubeWithEBO->createCubeMeshWithNoEBO(0.75f);
+
     for (int i = 0; i < NUM_CUBES; i++) {
         mUnlitCubes[i] = new Object3D();
         mUnlitCubes[i]->mMesh = cubeWithEBO;
@@ -65,9 +66,18 @@ void CubesTestingScene::Init() {
     if (err != GL_NO_ERROR) {
         std::cerr << "Error initing Textured Unlit Cubes: " <<  err <<std::endl;
     }
+
+    // If they go together, loads the texture to the previous open channel.
+    Texture2D &text = ResourceManager::LoadTexture("floor", "textures/floor.jpg");
+    ResourceManager::GetShader("TextureMatrix").SetTexture("textura", true, 0);
+
+    err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cerr << "Error loading textures: " <<  err <<std::endl;
+    }
     // Apply texture to first and then replicate the same texture in the others
-    int textureId = mUnlitCubes[0]->loadTextureFromFile(mTextureFilename, 1);
-    for (int i = 1; i < NUM_CUBES; i++) {
+    int textureId = text.ID;
+    for (int i = 0; i < NUM_CUBES; i++) {
         mUnlitCubes[i]->setTextureId(textureId);
     }
 
@@ -77,20 +87,23 @@ void CubesTestingScene::Init() {
     mLitCube->mMesh = cubeWithNormals;
 
     mLitCube->initShader("LitColorMatrix");
+    // Texture2D &text = ResourceManager::LoadTexture("floor", "textures/floor.jpg"); // Main texture is selected, so there is no need to open new channel
+
     // mLitCube->loadTextureFromFile(mTextureFilename);
     mLitCube->setTextureId(textureId);
     mLitCube->setPosition(glm::vec3(-1.0f, 1.0f, 0.0f));
 
     // A cool textured lit cube
-
-    mTexturedLitCube->mMesh = cubeWithNormals;
+    Mesh* cubeWithNormalsAndUV = new Mesh();
+    cubeWithNormalsAndUV->createCubeWithNormalsAndUV(0.75f);
+    mTexturedLitCube->mMesh = cubeWithNormalsAndUV;
     mTexturedLitCube->setTextureId(textureId);
     mTexturedLitCube->setPosition(glm::vec3(-1.0f, 0.0f, -3.0f));
     mTexturedLitCube->initShader("LitTexturedMatrix");
 
     // A light emissor
     Mesh* cube = new Mesh();
-    cube->createCubeMeshWithNoEBO(0.75f);
+    cube->createCubeMeshWithNoEBO(0.15f);
     mLightEmissor->mMesh = cube;
     mLightEmissor->initKnownShader();
 
@@ -105,12 +118,17 @@ void CubesTestingScene::Init() {
         std::cerr << "Error before setting up lighting: " <<  err <<std::endl;
     }
     // Uniforms of LitColorMatrix: lightColor, objectColor, lightPosition, viewPosition
+
     ResourceManager::GetShader("LitColorMatrix").SetVector3f("lightColor", lightColor.x, lightColor.y, lightColor.z, true);
     ResourceManager::GetShader("LitColorMatrix").SetVector3f("objectColor", objectColor.x, objectColor.y, objectColor.z);
+    ResourceManager::GetShader("LitColorMatrix").SetVector3f("viewPosition", mCamera->getPosition());
+    ResourceManager::GetShader("LitColorMatrix").SetVector3f("lightPosition", lightPosition);
 
     // Uniforms of LitTexturedMatrix textura, objectColor, lightPosition, viewPosition
-    ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("lightColor", lightColor.x, lightColor.y, lightColor.z, true);
-    ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("lightPosition", lightPosition.x, lightPosition.y, lightPosition.z, true);
+    ResourceManager::GetShader("LitTexturedMatrix").SetTexture("textura", true, 0);
+    ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("viewPosition", mCamera->getPosition());
+    ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("lightColor", lightColor.x, lightColor.y, lightColor.z);
+    ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("lightPosition", lightPosition.x, lightPosition.y, lightPosition.z);
 
     // mTexturedLitCube->setIlumination(lightColor, lightPosition);
 
@@ -121,8 +139,9 @@ void CubesTestingScene::Init() {
     err = glGetError();
     if (err != GL_NO_ERROR) {
         std::cerr << "Error when ending scene: " <<  err <<std::endl;
+        return;
     }
-    printf("Initialization finished. Start rendering\n");
+    printf("Initialization finished with no errors. Start rendering\n");
 }
 
 void CubesTestingScene::Render() {
@@ -137,11 +156,14 @@ void CubesTestingScene::Render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
+    // GameObject::render llama a activeTesture+bindtextura+ mesh::render
+    mLightEmissor->render(time, deltaTime, mCamera);
+
     for (int i = 0; i < NUM_CUBES; i++) {
         mUnlitCubes[i]->render(time, deltaTime, mCamera);
     }
 
-    mLightEmissor->render(time, deltaTime, mCamera);
+
     mLitCube->render(time, deltaTime, mCamera);
     mTexturedLitCube->render(time, deltaTime, mCamera);
 }
@@ -156,9 +178,11 @@ void CubesTestingScene::ProcessInput(float dt) {
     if (this->Keys[GLFW_KEY_E]) moveArray[4] = true; // Up
     if (this->Keys[GLFW_KEY_Q]) moveArray[5] = true; // Down
 
-    mCamera->updatePosition(moveArray);
+    mCamera->updatePosition(moveArray, dt);
+
+    // TURN
 }
 
 void CubesTestingScene::Update(float dt) {
-
+    mCamera->turn(mouseDeltaX, mouseDeltaY, dt);
 }

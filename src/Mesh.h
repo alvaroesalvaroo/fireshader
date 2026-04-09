@@ -27,6 +27,7 @@ public:
     void clear();
 
     void createCubeWithNormals(float size);
+    void createCubeWithNormalsAndUV(float size);
     void createCubeMeshWithNoEBO(float size);
     void createCubeMeshWithEBO(float size);
 

@@ -1,5 +1,9 @@
 .DS_Store
 .idea/
 cmake-build*
+
+!cmake-build-debug/mesh/
+!cmake-build-debug/shaders/
+!cmake-build-debug/textures/
 #src3DOldProject/
 .vs/

@@ -46,12 +46,66 @@ void Mesh::clear() {
     glDeleteBuffers(sizeof(mEBO), &mEBO);
 }
 
+void Mesh::createCubeWithNormalsAndUV(float size) {
+    mUseEBO = false;
+    int dataSize = 288; // 8 * 6 * 6
+    float vertices[] = {
+            // positions          // normals           // texture coords
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
 
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
+    };
+
+    mVertexData.clear();
+    mIndexData.clear();
+    for (int i = 0; i < dataSize; i++) {
+        mVertexData.push_back(vertices[i] * size);
+    }
+    prepareVAO(VertexLayout::PosNormalUV);
+}
 void Mesh::createCubeWithNormals(float size) {
     mUseEBO = false;
         // LA DATA ES DIFERENTE PORQUE AHORA TIENE NORMALS
     // No tenemos UV, por lo que el stride es de 6
-    int dataSize = 216;
+    int dataSize = 216; // 6 * 6 * 6
     float vertices[dataSize] = {
         -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
          0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -122,7 +176,6 @@ void Mesh::createCubeWithNormals(float size) {
     //     mIndexData.push_back(i);
     // }
     prepareVAO(VertexLayout::PosNormal);
-
 }
 void Mesh::createCubeMeshWithNoEBO(float size) {
     mUseEBO = false;
@@ -314,8 +367,6 @@ void Mesh::loadMeshFromFile(const char *filename) {
 void Mesh::prepareVAO(VertexLayout layout) {
     std::cout << "Preparing VAO with useEBO: "<< mUseEBO << " and layout type: " << (int) layout <<std::endl;
 
-    // INSECURE DEBUG!
-
     // Create VAO
     glGenVertexArrays(1, &mVAO);
     glBindVertexArray(mVAO);
@@ -327,6 +378,20 @@ void Mesh::prepareVAO(VertexLayout layout) {
     GLenum error;
     if ((error = glGetError()) != GL_NO_ERROR) {
         std::cerr << "ERROR buffering data: " << error << std::endl;
+    }
+    // Ensure integrity of Mesh:
+    size_t totalFloats = mVertexData.size();
+    int expectedStride = 0;
+    if (layout == VertexLayout::PosUV) expectedStride = 5;
+    else if (layout == VertexLayout::PosNormal) expectedStride = 6;
+    else if (layout == VertexLayout::PosUVColor || layout == VertexLayout::PosNormalUV) expectedStride = 8;
+    if (totalFloats % expectedStride != 0) {
+        std::cerr << "ERROR DE INTEGRIDAD EN MESH" << std::endl;
+        std::cerr << "Total floats: " << totalFloats << " no es divisible por stride: " << expectedStride << std::endl;
+        std::cerr << "Vértices sobrantes/faltantes: " << (totalFloats % expectedStride) << std::endl;
+        // No detenemos el programa, pero ya sabemos que se verá mal
+    } else {
+        std::cout << "Mesh Integrity OK: " << (totalFloats / expectedStride) << " vertices detectados." << std::endl;
     }
     //////////////////////////////////////////////////////////////////////
     if (layout == VertexLayout::PosUV) {
@@ -341,7 +406,9 @@ void Mesh::prepareVAO(VertexLayout layout) {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(GLfloat)));
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(0); glEnableVertexAttribArray(1); glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
     }
     else if (layout == VertexLayout::PosNormal) {
         // Stride 6: 3 pos + 3 normal

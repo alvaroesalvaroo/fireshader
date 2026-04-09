@@ -37,6 +37,11 @@ Camera3D::Camera3D(float sensitivityTurn, float cameraSpeed, float fov) {
     // Default screen size (will be corrected if setScreenSize is called after constructor)
     mScreenHeight = 600;
     mScreenWidth = 800;
+    // Update projection matrix
+    float screenWidth = static_cast<float>(mScreenWidth);
+    float screenHeight = static_cast<float>(mScreenHeight);
+    mProjectionMatrix = glm::perspective(glm::radians(mFov), screenWidth / screenHeight, 0.1f, 100.0f);
+    this->updateProjectionMatrix();
 }
 
 Camera3D::~Camera3D() = default;
@@ -45,41 +50,42 @@ void Camera3D::setScreenSize(int width, int height) {
     mScreenWidth = width;
     mScreenHeight = height;
 }
-void Camera3D::updatePosition(bool *moveArray) { // forward(w)-backward(s)-left(a)-right(d)-up(e)-down(q)
+void Camera3D::updatePosition(bool *moveArray, float deltaTime) { // forward(w)-backward(s)-left(a)-right(d)-up(e)-down(q)
     if (moveArray[0])	//forward
     {
-        mCameraPos += mCameraSpeed * mCameraFront;
+        mCameraPos += mCameraSpeed * mCameraFront * deltaTime;
     }
     if (moveArray[1])	//backward
     {
-        mCameraPos -= mCameraSpeed * mCameraFront;
+        mCameraPos -= mCameraSpeed * mCameraFront * deltaTime;
     }
     if (moveArray[2]) // left
     {
-        mCameraPos -= glm::normalize(glm::cross(mCameraFront, mCameraUp)) * mCameraSpeed;
+        mCameraPos -= glm::normalize(glm::cross(mCameraFront, mCameraUp)) * mCameraSpeed * deltaTime;
     }
     if (moveArray[3])	//right
     {
-        mCameraPos += glm::normalize(glm::cross(mCameraFront, mCameraUp)) * mCameraSpeed;
+        mCameraPos += glm::normalize(glm::cross(mCameraFront, mCameraUp)) * mCameraSpeed * deltaTime;
     }
     if (moveArray[4]) { // up
-        mCameraPos += mCameraSpeed * mCameraUp;
+        mCameraPos += mCameraSpeed * mCameraUp * deltaTime;
     }
     if (moveArray[5]) { // down
-        mCameraPos -= mCameraSpeed * mCameraUp;
+        mCameraPos -= mCameraSpeed * mCameraUp * deltaTime;
     }
 
     // TODO: remove this.
-    // No fly goes to ground
+    // No fly -> goes to ground
     if (!mCameraFly) {
         mCameraPos.y = mGround;
     }
 }
 
-void Camera3D::turn(float xTurn, float yTurn) {
-
-    xTurn *= mSensitivityTurn;
-    yTurn *= mSensitivityTurn;
+void Camera3D::turn(float xTurn, float yTurn, float deltaTime) {
+    if (abs(xTurn) < 10) xTurn = 0.f;
+    if (abs(yTurn) < 10) yTurn = 0.f;
+    xTurn *= mSensitivityTurn * deltaTime;
+    yTurn *= mSensitivityTurn * deltaTime;
 
     mYaw += xTurn;
     mPitch += yTurn;
@@ -141,14 +147,14 @@ void Camera3D::updateViewUniform(int uniformID) {
 
 }
 
-
-void Camera3D::updateProjectionUniform(int uniformID) {
+void Camera3D::updateProjectionMatrix() {
     float screenWidth = static_cast<float>(mScreenWidth);
     float screenHeight = static_cast<float>(mScreenHeight);
     mProjectionMatrix = glm::perspective(glm::radians(mFov), screenWidth / screenHeight, 0.1f, 100.0f);
+}
 
+void Camera3D::updateProjectionUniform(int uniformID) {
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(mProjectionMatrix));
-
 }
 
 

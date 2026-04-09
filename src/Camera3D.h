@@ -14,8 +14,8 @@ public:
     Camera3D();
     Camera3D(float sensitivityTurn, float cameraSpeed, float fov);
     ~Camera3D();
-    void updatePosition(bool *moveArray); // 4position up-down-left-right movement values
-    void turn(float xTurn, float yTurn);
+    void updatePosition(bool *moveArray, float deltaTime); // 4position up-down-left-right movement values
+    void turn(float xTurn, float yTurn, float deltaTime);
     void setZoom(float fov);
 
     // Setters
@@ -29,6 +29,9 @@ public:
     void setCameraUp(glm::vec3 up);
 
     void updateViewUniform(int uniformID);
+
+    void updateProjectionMatrix();
+
     void updateProjectionUniform(int uniformID);
 
 private:

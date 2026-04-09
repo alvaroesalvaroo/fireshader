@@ -31,7 +31,7 @@ class Object3D {
 public:
     Object3D();
     virtual ~Object3D();
-    int loadTextureFromFile(char const* filename, int textureIndex);
+    // int loadTextureFromFile(char const* filename);
     void setTextureId(int textureId) {mTexture = textureId;}
 
     virtual void render(double time, double deltaTime, Camera3D *camera);
@@ -40,17 +40,14 @@ public:
     virtual void setPosition(glm::vec3 position);
     void setRotation(glm::vec3 rotationAxis, float angle);
     void setScale(glm::vec3 scale);
-    Shader * getShader();   // shader should be managed by object himself. However, there is an option for setShader
     virtual void initShader(std::string shaderName);
     Mesh* mMesh;
 
 protected:
     std::string mShaderName;
     GLuint mTexture;
-    int mTextureIndex;
-    bool mIsTransparent;
-
-
+    // int mTextureIndex;
+    // bool mIsTransparent;
 
     Shader* mShader;
 

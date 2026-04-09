@@ -21,7 +21,7 @@
 Object3D::Object3D() {
     // Initialize an object in coordinates origin with no shader, vao, vbo, ebo or texture
     mPosition = glm::vec3(0.0f);
-    mRotation = glm::quat();
+    mRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f); // identidad
     mScale = glm::vec3(1.0f);
     mShader = nullptr;
     mTexture = -1;
@@ -33,6 +33,82 @@ Object3D::~Object3D()
     // If mesh is created here: delete mMesh;
     mMesh = nullptr;
 }
+
+// Classical transform update. Not doing anything since the goal is to become a shader master
+void Object3D::update(double time, double deltaTime) {
+
+}
+
+// Init shader and associate model-projection-view uniforms
+void Object3D::initShader(std::string shaderName) {
+
+    this->mShader = &ResourceManager::LoadShader(shaderName);
+
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cerr << "Error before initing shader " << err <<std::endl;
+    }
+
+    mUniformModel = glGetUniformLocation(mShader->getID(), "model");
+    mUniformProjection = glGetUniformLocation(mShader->getID(), "projection");
+    mUniformView = glGetUniformLocation(mShader->getID(), "view");
+
+    err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cerr << "Error after initing shader " << err <<std::endl;
+    }
+
+    if (mUniformModel == -1 || mUniformProjection == -1 || mUniformView == -1) {
+        std::cerr << "Uniforms model, projection or view NOT assigned in shader " << shaderName <<std::endl;
+    }
+
+    // std::cout << "Uniforms model, projection and view assigned in shader" << shaderName << std::endl;
+}
+
+
+
+void Object3D::render(double time, double deltaTime, Camera3D *camera) {
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   // Handly debug
+
+    mShader->Use();
+    camera->updateProjectionUniform(mUniformProjection);
+    camera->updateViewUniform(mUniformView);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, mTexture);
+
+    //Do matrix model movements
+    glm::mat4 transformMatrix = glm::mat4();
+    transformMatrix = glm::translate(transformMatrix, mPosition);
+    // Rotation with quaternion:
+    transformMatrix = transformMatrix * glm::mat4_cast(mRotation);
+    // Scale
+    transformMatrix = glm::scale(transformMatrix, mScale);
+    glUniformMatrix4fv(mUniformModel, 1, GL_FALSE, glm::value_ptr(transformMatrix));
+
+    // Render the mesh
+    if (mMesh != nullptr) {
+        mMesh->draw();
+    }
+    else {
+        std::cout << "GameObject " << this << " wont draw because has not mesh";
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glUseProgram(NULL);
+}
+
+
+void Object3D::setPosition(glm::vec3 position) {
+    mPosition = position;
+}
+void Object3D::setRotation(glm::vec3 rotationAxis, float angle) {
+    mRotation = glm::angleAxis(glm::radians(angle), rotationAxis);
+}
+void Object3D::setScale(glm::vec3 scale) {
+    mScale = scale;
+}
+
 //
 // int Object3D::loadTextureFromFile(char const *filename) {
 //
@@ -100,82 +176,4 @@ Object3D::~Object3D()
 //
 //     return mTexture;
 // }
-
-
-// Classical transform update. Not doing anything since the goal is to become a shader master
-void Object3D::update(double time, double deltaTime) {
-
-}
-
-
-// Init shader and associate model-projection-view uniforms
-void Object3D::initShader(std::string shaderName) {
-
-    this->mShader = &ResourceManager::LoadShader(shaderName);
-
-    GLenum err = glGetError();
-    if (err != GL_NO_ERROR) {
-        std::cerr << "Error before initing shader " << err <<std::endl;
-    }
-
-    mUniformModel = glGetUniformLocation(mShader->getID(), "model");
-    mUniformProjection = glGetUniformLocation(mShader->getID(), "projection");
-    mUniformView = glGetUniformLocation(mShader->getID(), "view");
-
-    err = glGetError();
-    if (err != GL_NO_ERROR) {
-        std::cerr << "Error after initing shader " << err <<std::endl;
-    }
-
-    if (mUniformModel == -1 || mUniformProjection == -1 || mUniformView == -1) {
-        std::cerr << "Uniforms model, projection or view NOT assigned in shader " << shaderName <<std::endl;
-    }
-
-    // std::cout << "Uniforms model, projection and view assigned in shader" << shaderName << std::endl;
-}
-
-
-
-void Object3D::render(double time, double deltaTime, Camera3D *camera) {
-
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   // Handly debug
-
-    mShader->Use();
-    camera->updateProjectionUniform(mUniformProjection);
-    camera->updateViewUniform(mUniformView);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mTexture);
-
-    //Do matrix model movements
-    glm::mat4 transformMatrix = glm::mat4();
-    transformMatrix = glm::translate(transformMatrix, mPosition);
-    // Rotation not supported now:
-    // transformMatrix = glm::rotate(transformMatrix, mRotationAngle, mRotationAxis);
-    transformMatrix = glm::scale(transformMatrix, mScale);
-    glUniformMatrix4fv(mUniformModel, 1, GL_FALSE, glm::value_ptr(transformMatrix));
-
-    // Render the mesh
-    if (mMesh != nullptr) {
-        mMesh->draw();
-    }
-    else {
-        std::cout << "GameObject " << this << " not draw because has not mesh";
-    }
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glUseProgram(NULL);
-}
-
-
-void Object3D::setPosition(glm::vec3 position) {
-    mPosition = position;
-}
-void Object3D::setRotation(glm::vec3 rotationAxis, float angle) {
-    mRotation = glm::angleAxis(glm::radians(angle), rotationAxis);
-}
-void Object3D::setScale(glm::vec3 scale) {
-    mScale = scale;
-}
-
-
 

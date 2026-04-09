@@ -95,17 +95,17 @@ void CubesTestingScene::Init() {
 
     // A cool textured lit cube
     Mesh* cubeWithNormalsAndUV = new Mesh();
-    cubeWithNormalsAndUV->createCubeWithNormalsAndUV(0.75f);
+    cubeWithNormalsAndUV->createCubeWithNormalsAndUV(2.f);
     mTexturedLitCube->mMesh = cubeWithNormalsAndUV;
     mTexturedLitCube->setTextureId(textureId);
-    mTexturedLitCube->setPosition(glm::vec3(-1.0f, 0.0f, -3.0f));
+    mTexturedLitCube->setPosition(glm::vec3(-0.0f, 0.0f, -3.0f));
     mTexturedLitCube->initShader("LitTexturedMatrix");
 
     // A light emissor
     Mesh* cube = new Mesh();
     cube->createCubeMeshWithNoEBO(0.15f);
     mLightEmissor->mMesh = cube;
-    mLightEmissor->initKnownShader();
+    mLightEmissor->initLightShader();
 
     // Decide light position and color
     glm::vec3 objectColor = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -136,19 +136,24 @@ void CubesTestingScene::Init() {
     mLightEmissor->setLightColor(lightColor);
     mLightEmissor->setPosition(lightPosition);
 
-    err = glGetError();
-    if (err != GL_NO_ERROR) {
-        std::cerr << "Error when ending scene: " <<  err <<std::endl;
-        return;
+    bool hadError;
+    while ((err = glGetError()) != GL_NO_ERROR) {
+        std::cerr << "Error pendiente al acabar Init: " << err << std::endl;
+        hadError = true;
     }
-    printf("Initialization finished with no errors. Start rendering\n");
+    if (!hadError) {
+        std::cout << "Initialization finished with no errors. Start rendering" << std::endl;
+    }
 }
 
+bool firstError = true;
 void CubesTestingScene::Render() {
 
     // GLenum err = glGetError();
-    // if (err != GL_NO_ERROR) {
-    //     std::cout << "Error when rendering ct scene: " <<  err <<std::endl;
+    // err = glGetError();
+    // if (err != GL_NO_ERROR && firstError) {
+    //     firstError = false;
+    //     std::cerr << "Error when rendering ct scene: " <<  err <<std::endl;
     // }
     double time = 0.0; // Placeholder porq asume que time/deltaTime son globales
     double deltaTime = 0.0; // Placeholder
@@ -156,15 +161,15 @@ void CubesTestingScene::Render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    // GameObject::render llama a activeTesture+bindtextura+ mesh::render
+    // GameObject::render llama a activeTexture+bindTexture. Coloca las uniforms mvp y dibuja su mesh
     mLightEmissor->render(time, deltaTime, mCamera);
 
     for (int i = 0; i < NUM_CUBES; i++) {
         mUnlitCubes[i]->render(time, deltaTime, mCamera);
     }
-
-
     mLitCube->render(time, deltaTime, mCamera);
+    ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("viewPosition", mCamera->getPosition(), true);
+    ResourceManager::GetShader("LitColorMatrix").SetVector3f("viewPosition", mCamera->getPosition(), true);
     mTexturedLitCube->render(time, deltaTime, mCamera);
 }
 
@@ -179,10 +184,18 @@ void CubesTestingScene::ProcessInput(float dt) {
     if (this->Keys[GLFW_KEY_Q]) moveArray[5] = true; // Down
 
     mCamera->updatePosition(moveArray, dt);
-
-    // TURN
 }
 
+float rotationSpeed = 0.0f;
+float rotation = 0;
+#define PI 3.14159265
 void CubesTestingScene::Update(float dt) {
     mCamera->turn(mouseDeltaX, mouseDeltaY, dt);
+
+    rotation += rotationSpeed * dt;
+    if (rotation > 360) {
+        rotation -= 360;
+    }
+    mTexturedLitCube->setRotation(glm::vec3(0.0f, 1.0f, 0.0f), rotation);
+
 }

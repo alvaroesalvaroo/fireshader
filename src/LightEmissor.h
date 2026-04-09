@@ -24,10 +24,7 @@ public:
         mPointLight.specular = glm::vec3(1.0, 1.0, 1.0);
     }
 
-    // void generateCube(float size) override;
-    void render(double time, double deltaTime, Camera3D *camera) override;
-    // void prepareVAO() override;
-    void initKnownShader();
+    void initLightShader();
     void setLight(float constant, float linear, float quadratic, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
     void setLightColor(glm::vec3 lightColor) {
         // Assign 3 ambient diffuse and specular colors to the same

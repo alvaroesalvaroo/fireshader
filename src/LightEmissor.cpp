@@ -4,13 +4,7 @@
 
 #include "LightEmissor.h"
 
-void LightEmissor::render(double time, double deltaTime, Camera3D *camera) {
-    mShader->Use();
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    Object3D::render(time, deltaTime, camera);
-}
-
-void LightEmissor::initKnownShader() {
+void LightEmissor::initLightShader() {
     // This method init a object who already has an atribute mShaderName
 
     Object3D::initShader(mShaderName);

@@ -1,6 +1,15 @@
 .DS_Store
 .idea/
-cmake-build*
+cmake-build-debug/.cmake/
+cmake-build-debug/CMakeFiles/
+cmake-build-debug/Testing/
+cmake-build-debug/.gitignore
+cmake-build-debug/*.exe
+cmake-build-debug/*.dll
+cmake-build-debug/*.ninja*
+cmake-build-debug/*.cmake
+cmake-build-debug/*.txt
+
 
 !cmake-build-debug/mesh/
 !cmake-build-debug/shaders/

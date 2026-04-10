@@ -18,19 +18,22 @@ public:
     }
     static inline Scene* CurrentScene;
 
-    // Destructor virtual es OBLIGATORIO en interfaces
+    Scene(int width, int height) {screenHeight = height; screenWidth = width;}
     virtual ~Scene() {}
 
     // Métodos virtuales puros (= 0)
     virtual void Init() = 0;
     virtual void ProcessInput(float dt) = 0;
     virtual void Update(float dt) = 0;
-    virtual void Render() = 0;
+    virtual void Render(float dt) = 0;
 
     bool Keys[1024];
     bool KeysProcessed[1024];
     float mouseDeltaX;
     float mouseDeltaY;
+protected:
+    int screenWidth, screenHeight;
+
 };
 
 #endif

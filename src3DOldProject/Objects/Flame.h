@@ -20,7 +20,7 @@ public:
     }
     void loadFlamesData(char const* filename, int numberOfShapes);
     void initShader(const char* shaderName) override;
-    void render(double time, double deltaTime, Camera3D *camera) override;
+    void render(double deltaTime, Camera3D *camera) override;
 private:
     void loadSingleFlameData(std::string filename, int listIndex);
     void prepareGeometryForShader();

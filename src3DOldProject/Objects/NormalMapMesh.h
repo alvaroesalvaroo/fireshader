@@ -12,7 +12,7 @@ public:
     }
     int loadNormalTexture(char const* filename);
 
-    void render(double time, double deltaTime, Camera3D *camera) override;
+    void render(double deltaTime, Camera3D *camera) override;
 
 private:
 

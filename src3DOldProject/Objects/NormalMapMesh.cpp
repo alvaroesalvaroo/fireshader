@@ -12,13 +12,13 @@
 
 
 
-void NormalMapMesh::render(double time, double deltaTime, Camera3D *camera){
+void NormalMapMesh::render(double deltaTime, Camera3D *camera){
   // Before rendering, we must assign normal texture
   mShader->Use();
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, mNormalMapTexture);
 
-  TexturedLitMesh::render(time, deltaTime, camera);
+  TexturedLitMesh::render(deltaTime, camera);
 
 }
 

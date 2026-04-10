@@ -14,7 +14,7 @@ public:
         mLightColorUniform = -1;
     }
     // void generateCube(float size) override;
-    void render(double time, double deltaTime, Camera3D *camera) override;
+    void render(double deltaTime, Camera3D *camera) override;
     // void prepareVAO() override;
     void initKnownShader();
     void generateCube(float size) override;

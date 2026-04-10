@@ -42,9 +42,13 @@ private:
     GLuint mVAO, mVBO, mEBO;
     std::vector<GLfloat> mVertexData;
     std::vector<GLuint> mIndexData;
+    // Used only with EBO:
+    std::vector<GLfloat> mNormalData;
+    std::vector<GLfloat> mUVData;
 
     int mArraysToDraw;  // 36 for cubes, 6 for planes
     bool mUseEBO;
+
 };
 
 

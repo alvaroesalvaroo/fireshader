@@ -4,7 +4,9 @@
 
 #include "Mesh.h"
 
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string_view>
 #include "glm.hpp"
 #include "detail/type_vec.hpp"
@@ -362,6 +364,123 @@ void Mesh::generatePlane(float size) {
 }
 
 void Mesh::loadMeshFromFile(const char *filename) {
+    mUseEBO = true;
+    // For now, only OBJ files
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open mesh file " << filename << std::endl;
+    }
+
+    std::string line;
+    int lineNumber = 0;
+
+    // Data of normal and uv has to be expanded to have as many as vertex
+    std::vector<GLfloat> shortNormalData;
+    std::vector<GLfloat> normalData;
+    std::vector<GLfloat> shortUVData;
+    std::vector<GLfloat> UVData;
+    bool vertexDataFinished = false;
+
+    while (std::getline(file, line)) {
+        std::stringstream lineStream(line);
+        std::string identifier;
+        lineStream >> identifier;
+        lineNumber++;
+
+        // Fill vertex data
+
+        if (identifier == "v") {  // Línea de vértice
+
+            GLfloat x, y, z;
+            lineStream >> x >> y >> z;
+            mVertexData.push_back(x);
+            mVertexData.push_back(y);
+            mVertexData.push_back(z);
+        }
+        // Fill uv data. In Blender uvdata /2 should match vertexdata / 3
+        else if (identifier == "vt") {
+
+            GLfloat u, v;
+            lineStream >> u >> v;
+            shortUVData.push_back(u);
+            shortUVData.push_back(v);
+        }
+        else if (identifier == "vn") {
+
+            GLfloat nx, ny, nz;
+            lineStream >> nx >> ny >> nz;
+            shortNormalData.push_back(nx);
+            shortNormalData.push_back(ny);
+            shortNormalData.push_back(nz);
+        }
+        else if (identifier == "f") {
+            if (!vertexDataFinished) {
+                vertexDataFinished = true;
+                normalData.resize(mVertexData.size()); // Assign the same size as the vertex data
+                UVData.resize(mVertexData.size() * 2 / 3);
+            }
+
+
+            for (int i = 0; i < 3; i++) {  // Procesar cada vértice de la cara con formato f p/u/n p/u/n p/u/n
+
+                int vertexIndex, uvIndex, normalIndex;
+                char slash;
+
+                lineStream >> vertexIndex >> slash >> uvIndex >> slash >> normalIndex;
+
+                if (vertexIndex == 0) {
+                    std::cerr << "Face referenced to vertex number 0. This should not happen in a obj file" << std::endl;
+                    return;
+                }
+                mIndexData.push_back(vertexIndex - 1);
+
+                if ((uvIndex == 0)) {
+                    std::cerr << "Face referenced to UV number 0. This should not happen in a obj file" << std::endl;
+                    return;
+                }
+
+                // Ad two numbers to UVData in the position vertex index suggests
+                UVData.at((vertexIndex-1) * 2 + 0) = shortUVData.at((uvIndex-1) * 2 + 0);
+                UVData.at((vertexIndex-1) * 2 + 1) = shortUVData.at((uvIndex-1) * 2 + 1);
+
+                if (normalIndex == 0) {
+                    std::cerr << "Face referenced to Normal number 0. This should not happen in a obj file" << std::endl;
+                    return;
+                }
+                // Ad three numbers to NormalData in the position vertex index suggests
+                normalData.at((vertexIndex-1) * 3 + 0) = shortNormalData.at((normalIndex-1) * 3 + 0);
+                normalData.at((vertexIndex-1) * 3 + 1) = shortNormalData.at((normalIndex-1) * 3 + 1);
+                normalData.at((vertexIndex-1) * 3 + 2) = shortNormalData.at((normalIndex-1) * 3 + 2);
+            }
+
+        }
+    }
+
+    file.close();
+
+    // NOW, join VertexData, NormalData and UVData
+    // Para hacerlo más efectivo, y compatible con la funcion prepareVAO
+
+    size_t vertexCount = mVertexData.size() / 3;
+    std::vector<GLfloat> allData;
+    allData.reserve(vertexCount * 8); // Stride 8: assign now all space
+    for (int i = 0; i < vertexCount; i++) {
+        allData.push_back(mVertexData[i * 3 + 0]);
+        allData.push_back(mVertexData[i * 3 + 1]);
+        allData.push_back(mVertexData[i * 3 + 2]);
+        allData.push_back(normalData[i * 3 + 0]);
+        allData.push_back(normalData[i * 3 + 1]);
+        allData.push_back(normalData[i * 3 + 2]);
+        allData.push_back(UVData[i * 2 + 0]);
+        allData.push_back(UVData[i * 2 + 1]);
+    }
+
+    mVertexData = std::move(allData); // Transfer all data to vertexdata
+    normalData.clear();
+    UVData.clear();
+    std::cout << "Loaded mesh " << filename << " with " << vertexCount << " vertices and " << mVertexData.size() << " data size" << std::endl;
+
+    prepareVAO(VertexLayout::PosNormalUV);
 }
 
 void Mesh::prepareVAO(VertexLayout layout) {

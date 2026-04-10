@@ -11,7 +11,7 @@
 #include <string>
 
 
-void TexturedLitMesh::render(double time, double deltaTime, Camera3D *camera) {
+void TexturedLitMesh::render(double deltaTime, Camera3D *camera) {
     // Generic render
     mShader->Use();
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -21,7 +21,7 @@ void TexturedLitMesh::render(double time, double deltaTime, Camera3D *camera) {
     glUniform3f(mViewPositionUniform, viewPosition.x, viewPosition.y, viewPosition.z);
 
     // CHANGE RENDER TRIANGLES NUMBER TO 6
-    Object3D::render(time, deltaTime, camera);
+    Object3D::render(deltaTime, camera);
 
 
 }

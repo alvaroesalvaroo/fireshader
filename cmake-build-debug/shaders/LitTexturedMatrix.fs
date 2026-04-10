@@ -14,10 +14,10 @@ uniform vec3 lightPosition;
 // Constants del material (hacer un material mas adelante)
 const float materialShininess = 32;
 const float materialAmbient = 0.1;
-const float materialDiffuse = 0.4;
-const float materialSpecular = 0.8;
+const float materialDiffuse = 0.8;
+const float materialSpecular = 0.4;
 
-const float attConstant  = 0.5;
+const float attConstant  = 1;
 const float attLinear    = 0.09;
 const float attQuadratic = 0.032;
 

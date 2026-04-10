@@ -23,11 +23,9 @@ public:
     void Init() override;
     void ProcessInput(float dt) override;
     void Update(float dt) override;
-    void Render() override;
+    void Render(float dt) override;
 
 private:
-    int screenWidth, screenHeight;
-    const char* mTextureFilename = "textures/floor.jpg";
 
 #define NUM_CUBES 6
     Camera3D* mCamera;

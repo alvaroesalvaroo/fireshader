@@ -35,7 +35,7 @@ Object3D::~Object3D()
 }
 
 // Classical transform update. Not doing anything since the goal is to become a shader master
-void Object3D::update(double time, double deltaTime) {
+void Object3D::update(double deltaTime) {
 
 }
 
@@ -67,7 +67,7 @@ void Object3D::initShader(std::string shaderName) {
 
 
 
-void Object3D::render(double time, double deltaTime, Camera3D *camera) {
+void Object3D::render(double deltaTime, Camera3D *camera) {
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   // Handly debug
 

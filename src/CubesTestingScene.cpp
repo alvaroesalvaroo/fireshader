@@ -28,7 +28,7 @@
 using namespace glm;
 
 CubesTestingScene::CubesTestingScene(int width, int height)
-    : screenWidth(width), screenHeight(height) {
+    : Scene(width, height) {
     mLitCube = new Object3D();
     mTexturedLitCube = new Object3D();
     mLightEmissor = new LightEmissor();
@@ -119,16 +119,16 @@ void CubesTestingScene::Init() {
     }
     // Uniforms of LitColorMatrix: lightColor, objectColor, lightPosition, viewPosition
 
-    ResourceManager::GetShader("LitColorMatrix").SetVector3f("lightColor", lightColor.x, lightColor.y, lightColor.z, true);
-    ResourceManager::GetShader("LitColorMatrix").SetVector3f("objectColor", objectColor.x, objectColor.y, objectColor.z);
+    ResourceManager::GetShader("LitColorMatrix").SetVector3f("lightColor", lightColor, true);
+    ResourceManager::GetShader("LitColorMatrix").SetVector3f("objectColor", objectColor);
     ResourceManager::GetShader("LitColorMatrix").SetVector3f("viewPosition", mCamera->getPosition());
     ResourceManager::GetShader("LitColorMatrix").SetVector3f("lightPosition", lightPosition);
 
     // Uniforms of LitTexturedMatrix textura, objectColor, lightPosition, viewPosition
     ResourceManager::GetShader("LitTexturedMatrix").SetTexture("textura", true, 0);
     ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("viewPosition", mCamera->getPosition());
-    ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("lightColor", lightColor.x, lightColor.y, lightColor.z);
-    ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("lightPosition", lightPosition.x, lightPosition.y, lightPosition.z);
+    ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("lightColor", lightColor);
+    ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("lightPosition", lightPosition);
 
     // mTexturedLitCube->setIlumination(lightColor, lightPosition);
 
@@ -147,7 +147,7 @@ void CubesTestingScene::Init() {
 }
 
 bool firstError = true;
-void CubesTestingScene::Render() {
+void CubesTestingScene::Render(float dt) {
 
     // GLenum err = glGetError();
     // err = glGetError();
@@ -155,22 +155,21 @@ void CubesTestingScene::Render() {
     //     firstError = false;
     //     std::cerr << "Error when rendering ct scene: " <<  err <<std::endl;
     // }
-    double time = 0.0; // Placeholder porq asume que time/deltaTime son globales
-    double deltaTime = 0.0; // Placeholder
+
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
     // GameObject::render llama a activeTexture+bindTexture. Coloca las uniforms mvp y dibuja su mesh
-    mLightEmissor->render(time, deltaTime, mCamera);
+    mLightEmissor->render(dt, mCamera);
 
     for (int i = 0; i < NUM_CUBES; i++) {
-        mUnlitCubes[i]->render(time, deltaTime, mCamera);
+        mUnlitCubes[i]->render(dt, mCamera);
     }
-    mLitCube->render(time, deltaTime, mCamera);
+    mLitCube->render(dt, mCamera);
     ResourceManager::GetShader("LitTexturedMatrix").SetVector3f("viewPosition", mCamera->getPosition(), true);
     ResourceManager::GetShader("LitColorMatrix").SetVector3f("viewPosition", mCamera->getPosition(), true);
-    mTexturedLitCube->render(time, deltaTime, mCamera);
+    mTexturedLitCube->render(dt, mCamera);
 }
 
 void CubesTestingScene::ProcessInput(float dt) {

@@ -64,16 +64,14 @@ set(SOURCE_FILES
         src/CubesTestingScene.cpp
         src/Object3D.h
         src/Object3D.cpp
-#        src3DOldProject/Objects/LitCube.h
-#        src3DOldProject/Objects/LitCube.cpp
-        src/LightEmissor.h
-        src/LightEmissor.cpp
-#        src3DOldProject/Objects/TexturedUnlitCube.h
-#        src3DOldProject/Objects/TexturedUnlitCube.cpp
-#        src3DOldProject/Objects/TexturedLitPlane.h
-#        src3DOldProject/Objects/TexturedLitPlane.cpp
+        src/Rendering/LightEmissor.h
+        src/Rendering/LightEmissor.cpp
         src/Mesh.cpp
         src/Mesh.h
+        src/FireScene.h
+        src/FireScene.cpp
+        src/Material.cpp
+        src/Material.h
 
 )
 

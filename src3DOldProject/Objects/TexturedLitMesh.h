@@ -17,7 +17,7 @@ public:
         mPointLight = nullptr;
     }
     // Override adds camera update
-    void render(double time, double deltaTime, Camera3D *camera) override;
+    void render(double deltaTime, Camera3D *camera) override;
 
     void loadMeshFromFile(char const *filename);
     void prepareMeshData();

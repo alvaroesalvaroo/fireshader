@@ -21,6 +21,7 @@
 #include "Scene.h"
 
 #include "CubesTestingScene.h"
+#include "FireScene.h"
 
 bool initGL();
 // GLFW function declarations
@@ -54,8 +55,8 @@ int main(int argc, char *argv[])
 
     // initialize scene
     // ---------------
-    Scene::ChangeScene(new CubesTestingScene(SCREEN_WIDTH, SCREEN_HEIGHT));
-
+    // Scene::ChangeScene(new CubesTestingScene(SCREEN_WIDTH, SCREEN_HEIGHT));
+    Scene::ChangeScene(new FireScene(SCREEN_WIDTH, SCREEN_HEIGHT));
     Scene::CurrentScene->Init();
 
     GLenum err = glGetError();
@@ -90,7 +91,7 @@ int main(int argc, char *argv[])
         // ------
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        Scene::CurrentScene->Render();
+        Scene::CurrentScene->Render(deltaTime);
 
         glfwSwapBuffers(gWindow);
 

@@ -4,12 +4,10 @@
 
 #ifndef OBJECT3D_H
 #define OBJECT3D_H
-#include <vector>
 #include <string>
 
 #include <glad/glad.h>
 #include "glm.hpp"
-#include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
 #include "Shader.h"
 #include "Camera3D.h"
@@ -34,12 +32,13 @@ public:
     // int loadTextureFromFile(char const* filename);
     void setTextureId(int textureId) {mTexture = textureId;}
 
-    virtual void render(double time, double deltaTime, Camera3D *camera);
+    virtual void render(double deltaTime, Camera3D *camera);
 
-    virtual void update(double time, double deltaTime); // The goal is not to use it (very much)
+    virtual void update(double deltaTime); // The goal is not to use it (very much)
     virtual void setPosition(glm::vec3 position);
     void setRotation(glm::vec3 rotationAxis, float angle);
     void setScale(glm::vec3 scale);
+    glm::vec3 getPosition() {return mPosition;}
     virtual void initShader(std::string shaderName);
     Mesh* mMesh;
 

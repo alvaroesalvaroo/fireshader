@@ -7,7 +7,6 @@
 #include "Object3D.h"
 
 
-
 class LightEmissor : public Object3D{
 public:
     LightEmissor() : Object3D() {

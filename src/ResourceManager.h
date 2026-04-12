@@ -32,7 +32,7 @@ public:
     // loads (and generates) a shader program from file loading vertex, fragment (and geometry) shader's source code. If gShaderFile is not nullptr, it also loads a geometry shader
     static Shader &LoadShader(std::string name);
     // retrieves a stored sader
-    static Shader    GetShader(std::string name);
+    static Shader    &GetShader(std::string name);
     // loads (and generates) a texture from file
     static Texture2D &LoadTexture(const char* name, const char* path);
     // retrieves a stored texture

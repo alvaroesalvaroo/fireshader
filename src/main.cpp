@@ -1,11 +1,6 @@
-/*******************************************************************
-** This code is part of Scene::CurrentScene->
-**
-** Breakout is free software: you can redistribute it and/or modify
-** it under the terms of the CC BY 4.0 license as published by
-** Creative Commons, either version 4 of the License, or (at your
-** option) any later version.
-******************************************************************/
+/***********************************************************************
+** Main Loop. Manages Scene creation, Audio loading and stats text render
+***********************************************************************/
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -13,7 +8,6 @@
 
 #include <iostream>
 
-#include "ResourceManager.h"
 #include <SDL.h>
 #include <vector>
 
@@ -22,6 +16,9 @@
 
 #include "CubesTestingScene.h"
 #include "FireScene.h"
+// #include "LightTestScene.h"
+
+#include "TextRenderer.h"
 
 bool initGL();
 // GLFW function declarations
@@ -33,9 +30,12 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 GLFWwindow* gWindow;
 
 // The Width of the screen
-const unsigned int SCREEN_WIDTH = 1200;
+const unsigned int SCREEN_WIDTH = 1920;
 // The height of the screen
-const unsigned int SCREEN_HEIGHT = 800;
+const unsigned int SCREEN_HEIGHT = 1080;
+
+TextRenderer* textRenderer;
+std::string statsText = "FPS: 0";
 
 int main(int argc, char *argv[])
 {
@@ -53,14 +53,14 @@ int main(int argc, char *argv[])
     // AudioEngine::SetMusicVolume(60);    // from 0 to 128
     // AudioEngine::PlayMusic("music", -1); // Play music on loop
 
+    // Text renderer
+    textRenderer = new TextRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+    textRenderer->Load("fonts/ocraext.ttf", 24);
     // initialize scene
     // ---------------
     // Scene::ChangeScene(new CubesTestingScene(SCREEN_WIDTH, SCREEN_HEIGHT));
     Scene::ChangeScene(new FireScene(SCREEN_WIDTH, SCREEN_HEIGHT));
     Scene::CurrentScene->Init();
-
-    GLenum err = glGetError();
-
 
     // deltaTime variables
     // -------------------
@@ -90,17 +90,26 @@ int main(int argc, char *argv[])
         // render
         // ------
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         Scene::CurrentScene->Render(deltaTime);
 
-        glfwSwapBuffers(gWindow);
 
         // Update performance stats
         timeSinceLastStatUpdate += deltaTime;
+
+
         if (timeSinceLastStatUpdate > 1.0f) {
             timeSinceLastStatUpdate = 0.0f;
             deltaTimes.push_back(deltaTime);
+            statsText = "FPS: " + std::to_string(static_cast<int>(1.0f / deltaTime));
         }
+        glDisable(GL_DEPTH_TEST);
+        textRenderer->RenderText(statsText, 20, 20, 1, glm::vec3(1, 1, 1));
+        glEnable(GL_DEPTH_TEST);
+        glfwSwapBuffers(gWindow);
+
+
     }
 
     // delete all resources as loaded using the resource manager
@@ -174,7 +183,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
     }
 
-    // Mouse callba
 }
 float lastX = 400, lastY = 300;
 bool firstMouse = true;

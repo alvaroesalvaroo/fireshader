@@ -68,8 +68,10 @@ set(SOURCE_FILES
         src/Rendering/LightEmissor.cpp
         src/Mesh.cpp
         src/Mesh.h
-        src/FireScene.h
+#        src/LightTestScene.h
+#        src/LightTestScene.cpp
         src/FireScene.cpp
+        src/FireScene.h
         src/Material.cpp
         src/Material.h
 
@@ -120,6 +122,8 @@ include_directories(src/Rendering)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
 # Copiar la carpeta de assets a la build
+return()
+
 set(ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
 set(BUILD_ASSETS_DIR "${CMAKE_BINARY_DIR}/assets")
 file(MAKE_DIRECTORY ${BUILD_ASSETS_DIR})

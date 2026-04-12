@@ -4,6 +4,8 @@
 
 #ifndef FIRESCENE_H
 #define FIRESCENE_H
+#include <vector>
+
 #include "Scene.h"
 
 
@@ -16,7 +18,6 @@ public:
     FireScene(int width, int height);
     ~FireScene() override;
 
-
     void Init() override;
     void ProcessInput(float dt) override;
     void Update(float dt) override;
@@ -24,11 +25,14 @@ public:
 
 private:
 
-#define NUM_CUBES 6
+    #define NUM_CUBES 6
+
     Camera3D* mCamera;
     // Object3D* mLitCube;
     Object3D* mTexturedLitCube;
-    LightEmissor* mLightEmissor;
+    // LightEmissor* mLightEmissor;
+    std::vector<LightEmissor*> mLights;
+    std::vector<int> mLightPositionsUniforms;
 
     // NormalMapMesh* gGround = new NormalMapMesh();
     // Flame* gFlame = new Flame();

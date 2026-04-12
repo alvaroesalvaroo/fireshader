@@ -13,17 +13,6 @@
 #include "Camera3D.h"
 #include "Mesh.h"
 
-struct PointLight { // Same structure as in the shader
-    glm::vec3 position;  // Will match object position
-    float intensity = 2.0f;
-    float constant;
-    float linear;
-    float quadratic;
-
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-};
 
 class Object3D {
 public:

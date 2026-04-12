@@ -105,7 +105,7 @@ void CubesTestingScene::Init() {
     Mesh* cube = new Mesh();
     cube->createCubeMeshWithNoEBO(0.15f);
     mLightEmissor->mMesh = cube;
-    mLightEmissor->initLightShader();
+    mLightEmissor->initLightEmissorShader();
 
     // Decide light position and color
     glm::vec3 objectColor = glm::vec3(1.0f, 0.0f, 0.0f);

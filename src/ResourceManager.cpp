@@ -35,7 +35,7 @@ Shader &ResourceManager::LoadShader(std::string name)
     return Shaders[name];
 }
 
-Shader ResourceManager::GetShader(std::string name)
+Shader &ResourceManager::GetShader(std::string name)
 {
     return Shaders[name];
 }

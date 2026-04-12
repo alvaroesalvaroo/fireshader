@@ -45,7 +45,7 @@ void TextRenderer::Load(std::string font, unsigned int fontSize)
     // load font as face
     FT_Face face;
     if (FT_New_Face(ft, font.c_str(), 0, &face))
-        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+        std::cerr << "ERROR::FREETYPE: Failed to load font " << font << std::endl;
     // set size to load glyphs as
     FT_Set_Pixel_Sizes(face, 0, fontSize);
     // disable byte-alignment restriction
@@ -93,6 +93,7 @@ void TextRenderer::Load(std::string font, unsigned int fontSize)
     // destroy FreeType once we're finished
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
+    std::cout << "Font " << font << " loaded" << std::endl;
 }
 
 void TextRenderer::RenderText(std::string text, float x, float y, float scale, glm::vec3 color)

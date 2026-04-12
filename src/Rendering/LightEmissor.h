@@ -7,29 +7,35 @@
 #include "Object3D.h"
 
 
+struct PointLight { // Same structure as in the shader
+    // glm::vec3 position;  // Will match object position
+    glm::vec3 color;
+
+    float intensity = 1.0f;
+
+    // Attenuation
+    float attConstant = 1.0f;
+    float attLinear = 0.1f;
+    float attQuadratic = 0.04f;
+
+};
 class LightEmissor : public Object3D{
 public:
+
     LightEmissor() : Object3D() {
         mLightColorUniform = -1;
-        // Default light
-        // mPointLight.intensity = 2.0f;
-        // Attenuation
-        mPointLight.constant = 1.0f;
-        mPointLight.linear = 0.7f;  //0.7f
-        mPointLight.quadratic = 1.8f;   //1.8f
-        // Lights
-        mPointLight.diffuse = glm::vec3(1.0, 1.0, 1.0);
-        mPointLight.ambient = glm::vec3(1.0, 1.0, 1.0);
-        mPointLight.specular = glm::vec3(1.0, 1.0, 1.0);
+
     }
 
-    void initLightShader();
-    void setLight(float constant, float linear, float quadratic, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
-    void setLightColor(glm::vec3 lightColor) {
-        // Assign 3 ambient diffuse and specular colors to the same
-        setLight(mPointLight.constant, mPointLight.linear, mPointLight.quadratic, lightColor, lightColor, lightColor);
-    }
-    void setPosition(glm::vec3 position) override;
+    void initLightEmissorShader();
+
+    void updateLightUniformIntoShader(Shader *shader, bool useShader = false);
+
+    void updateLightPositionIntoShader(Shader *shader, bool useShader = false);
+
+    void setLight(glm::vec3 color, float intensity = 1.0f, float constant = 1.f, float linear = 0.1f, float quadratic = 0.04f);
+    void setLightColor(glm::vec3 lightColor);
+
     struct PointLight* getPointLight();
 private:
     std::string mShaderName = "LightEmissor";

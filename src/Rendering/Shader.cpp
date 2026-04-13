@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "glad/glad.h"
+
 Shader &Shader::Use()
 {
     glUseProgram(this->ID);

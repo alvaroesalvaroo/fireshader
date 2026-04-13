@@ -40,26 +40,16 @@ void Object3D::update(double deltaTime) {
 }
 
 // Init shader and associate model-projection-view uniforms
-void Object3D::setShader(std::string shaderName) {
+void Object3D::setShader(Shader *shader) {
 
-    this->mShader = &ResourceManager::LoadShader(shaderName);
-
-    GLenum err = glGetError();
-    if (err != GL_NO_ERROR) {
-        std::cerr << "Error before initing shader " << shaderName<<": " <<err <<std::endl;
-    }
+    this->mShader = shader;
 
     mUniformModel = glGetUniformLocation(mShader->getID(), "model");
     mUniformProjection = glGetUniformLocation(mShader->getID(), "projection");
     mUniformView = glGetUniformLocation(mShader->getID(), "view");
 
-    err = glGetError();
-    if (err != GL_NO_ERROR) {
-        std::cerr << "Error after initing shader " << err <<std::endl;
-    }
-
     if (mUniformModel == -1 || mUniformProjection == -1 || mUniformView == -1) {
-        std::cerr << "Uniforms model, projection or view NOT assigned in shader " << shaderName <<std::endl;
+        std::cerr << "Uniforms model, projection or view NOT assigned in shader " << shader->mName <<std::endl;
     }
 
     // std::cout << "Uniforms model, projection and view assigned in shader" << shaderName << std::endl;

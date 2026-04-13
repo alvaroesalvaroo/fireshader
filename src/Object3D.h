@@ -28,7 +28,7 @@ public:
     void setRotation(glm::vec3 rotationAxis, float angle);
     void setScale(glm::vec3 scale);
     glm::vec3 getPosition() {return mPosition;}
-    void setShader(std::string shaderName);
+    void setShader(Shader *shader);
     Mesh* mMesh;
 
 protected:

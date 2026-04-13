@@ -3,26 +3,22 @@
 //
 
 // Basic
+#include <iostream>
+// OpenGl
+#include "glad/glad.h"
 
+#include "GLFW/glfw3.h"
 
-#include <stdio.h>
+// Maths
+#include "glm.hpp"
+#include "gtc/type_ptr.hpp"
+
 // Own modules
 #include "FireScene.h"
 #include "Shader.h"
-// OpenGl
-#include <glad/glad.h>
-
-
-// Maths
-#include <cmath>
-#include <iostream>
-
-#include "glm.hpp"
-#include "gtc/type_ptr.hpp"
 #include "LightEmissor.h"
 #include "Material.h"
 #include "ResourceManager.h"
-#include "GLFW/glfw3.h"
 
 using namespace glm;
 
@@ -51,6 +47,11 @@ FireScene::FireScene(int width, int height) : ::Scene(width, height) {
 FireScene::~FireScene() {
 }
 
+#define SPARKS_NUMBER 5
+#define SPARKS_RANDOMNESS 12.0f
+#define TIME_TO_UPDATE_SPARKS 1.f
+float timeSinceUpdateSparks = 0;
+
 void FireScene::Init() {
 
     // Handly debug
@@ -60,10 +61,22 @@ void FireScene::Init() {
     cubeMesh->createCubeMeshWithNoEBO(0.1);
     // TWO LIGHTS
 
-    LightEmissor* lightEmissor = new LightEmissor();
-    LightEmissor* lightEmissor2 = new LightEmissor();
-    mLights.push_back(lightEmissor);
-    mLights.push_back(lightEmissor2);
+    for (int i = 0; i < SPARKS_NUMBER; i++) {
+        LightEmissor* lightEmissor = new LightEmissor();
+        mLights.push_back(lightEmissor);
+        Spark newSpark;
+        glm::vec3 randomVel = glm::vec3(
+        ((rand() / (float)RAND_MAX) * 2.0f - 1.0f) * SPARKS_RANDOMNESS,
+        0.0f,
+        ((rand() / (float)RAND_MAX) * 2.0f - 1.0f) * SPARKS_RANDOMNESS);
+        newSpark.velocity = randomVel;
+        mSparks.push_back(newSpark);
+
+    }
+    // LightEmissor* lightEmissor = new LightEmissor();
+    // LightEmissor* lightEmissor2 = new LightEmissor();
+    // mLights.push_back(lightEmissor);
+    // mLights.push_back(lightEmissor2);
 
     GLenum err = glGetError();
 
@@ -79,8 +92,9 @@ void FireScene::Init() {
     mGround->mMesh = groundMesh;
     err = glGetError();
 
-    mGround->setShader(GroundShaderName);
-    Shader& litShader = ResourceManager::LoadShader(GroundShaderName); // Should migrate to this method
+    Shader& litShader = ResourceManager::LoadShader(GroundShaderName);
+
+    mGround->setShader(&litShader);
 
     // mGround->setIllumination(mLightEmissor->getPointLight(), GroundShaderName);
     err = glGetError();
@@ -91,18 +105,23 @@ void FireScene::Init() {
     litShader.SetTexture("textura", true, 0);
     litShader.SetVector3f("viewPosition", mCamera->getPosition());
 
+    Shader &emissionShader = ResourceManager::LoadShader("LightEmissor");
     // Point Lights
     for (int i = 0; i < mLights.size(); i++) {
         // 1. Datos puros, sin GL
         mLights[i]->mMesh = cubeMesh;
         mLights[i]->setPosition(lightPosition);
         // Shader emissive
-        mLights[i]->initEmissionShader();
+        mLights[i]->setShader(&emissionShader);
         // Both emissive (color) and receptive (setups uniform)
-        mLights[i]->setLight(lightColor, 1);  // Solo asigna mPointLight, sin GL todavía
+        mLights[i]->setLight(lightColor, 1, 1.0, 0.1, 2);  // Solo asigna mPointLight, sin GL todavía
 
         // Shader receptor
         mLights[i]->initLightUniformIntoShader(&litShader, i, true);
+        // Cachear uniforms de light position, se usan mucho en el render
+        std::string uniformName = "lights[" + std::to_string(i) + "].position";
+        GLint positionUniform = glGetUniformLocation(litShader.getID(), uniformName.c_str());
+        mLightPositionsUniforms.push_back(positionUniform);
     }
     // Importante: light count en el receptor
     litShader.SetInteger("lightCount", mLights.size(), true);
@@ -172,12 +191,17 @@ void FireScene::Render(float dt) {
 
     litShader.SetVector3f("viewPosition", mCamera->getPosition(), true);
 
-    // update ALL lights
-    litShader.Use();
     for (int i = 0; i < mLights.size(); i++) {
-        mLights[i]->updateLightPositionIntoShader(&litShader, i, false);
+        // PUede ser optimizado cacheando la uniform:
+        // mLights[i]->updateLightPositionIntoShader(&litShader, i, false);
+
         // std::string uniformName = "lights[" + std::to_string(i) + "].position";
         // litShader.SetVector3f(uniformName.c_str(), mLights[i]->getPosition());
+
+        // Optimización (practicamente imperceptible)
+        glm::vec3 lightPos = mLights[i]->getPosition();
+        glUniform3f(mLightPositionsUniforms[i], lightPos.x, lightPos.y, lightPos.z);
+
     }
 
     mGround->render(dt, mCamera);
@@ -186,16 +210,65 @@ void FireScene::Render(float dt) {
     // gSmokeAttemp->updateLightPositions(mLightEmissor->getPointLight()->position);
     // gSmokeAttemp->render(dt, mCamera);
 }
+
+
+
+
+void updateSpark(Spark &spark, float dt) {
+
+    const float speedY        = 1.2f;
+    const float noiseStrength = 800.f;
+    const float damping       = 0.6f;
+    const float maxY = 3.0f;
+
+    spark.accTimer += dt;
+    if (spark.accTimer >= spark.accUpdateRate) {
+        spark.accTimer = 0;
+        spark.accUpdateRate = 1.f + (rand() / (float)RAND_MAX);
+        // std::cout << "update spark acc" << std::endl;
+
+        glm::vec3 randomAccel = glm::vec3(
+            ((rand() / (float)RAND_MAX) * 2.0f - 1.0f) * noiseStrength,
+            0.0f,
+            ((rand() / (float)RAND_MAX) * 2.0f - 1.0f) * noiseStrength
+        );
+        spark.acceleration = randomAccel;
+    }
+
+    spark.velocity.x = spark.velocity.x * damping + spark.acceleration.x * dt;
+    spark.velocity.y = speedY;
+    spark.velocity.z = spark.velocity.z * damping + spark.acceleration.z * dt;
+
+    spark.position += spark.velocity * dt;
+    spark.lifetime += dt;
+
+    if (spark.position.y > maxY) {
+        spark.position = glm::vec3(0.0f);
+        spark.velocity = glm::vec3(rand() / (float)RAND_MAX, 0.0f, rand() / (float)RAND_MAX);
+        spark.lifetime = 0.0f;
+    }
+}
+
 #define PI 3.14159265
 float totalTime = 0;
+
 void FireScene::Update(float dt) {
     totalTime += dt;
-    glm::vec3 lightPosition = glm::vec3(0.3f + cos(totalTime), 0.5, 2 * sin(totalTime));
-    glm::vec3 lightPosition2 = glm::vec3(0.3f + cos(totalTime + PI), 0.5, 2 * sin(totalTime + PI));
-    mLights[0]->setPosition(lightPosition);
-    mLights[1]->setPosition(lightPosition2);
+    // glm::vec3 lightPosition = glm::vec3(0.3f + cos(totalTime), 0.5, 2 * sin(totalTime));
+    // glm::vec3 lightPosition2 = glm::vec3(0.3f + cos(totalTime + PI), 0.5, 2 * sin(totalTime + PI));
+    // mLights[0]->setPosition(lightPosition);
+    // mLights[1]->setPosition(lightPosition2);
+
+
+    // TODO: Chispas
+
+    for (int i = 0; i < mSparks.size(); i++) {
+        updateSpark(mSparks[i], dt);
+        mLights[i]->setPosition(mSparks[i].position);
+    }
 
     mCamera->turn(mouseDeltaX, mouseDeltaY, dt);
-
 }
+
+
 

@@ -55,11 +55,13 @@ void CubesTestingScene::Init() {
     Mesh* cubeWithEBO = new Mesh();
     cubeWithEBO->createCubeMeshWithNoEBO(0.75f);
 
+    Shader &unlitShader = ResourceManager::LoadShader("TextureMatrix");
+
     for (int i = 0; i < NUM_CUBES; i++) {
         mUnlitCubes[i] = new Object3D();
         mUnlitCubes[i]->mMesh = cubeWithEBO;
         // mUnlitCubes[i]->generateCube(0.75f);
-        mUnlitCubes[i]->setShader("TextureMatrix");
+        mUnlitCubes[i]->setShader(&unlitShader);
         mUnlitCubes[i]->setPosition(glm::vec3((float)i, -1.0f, 0.0f));
     }
     GLenum err = glGetError();
@@ -69,7 +71,7 @@ void CubesTestingScene::Init() {
 
     // If they go together, loads the texture to the previous open channel.
     Texture2D &text = ResourceManager::LoadTexture("floor", "textures/floor.jpg");
-    ResourceManager::GetShader("TextureMatrix").SetTexture("textura", true, 0);
+    unlitShader.SetTexture("textura", true, 0);
 
     err = glGetError();
     if (err != GL_NO_ERROR) {
@@ -86,7 +88,7 @@ void CubesTestingScene::Init() {
     cubeWithNormals->createCubeWithNormals(0.75f);
     mLitCube->mMesh = cubeWithNormals;
 
-    mLitCube->setShader("LitColorMatrix");
+    mLitCube->setShader(&ResourceManager::LoadShader("LitColorMatrix"));
     // Texture2D &text = ResourceManager::LoadTexture("floor", "textures/floor.jpg"); // Main texture is selected, so there is no need to open new channel
 
     // mLitCube->loadTextureFromFile(mTextureFilename);
@@ -99,13 +101,16 @@ void CubesTestingScene::Init() {
     mTexturedLitCube->mMesh = cubeWithNormalsAndUV;
     mTexturedLitCube->setTextureId(textureId);
     mTexturedLitCube->setPosition(glm::vec3(-0.0f, 0.0f, -3.0f));
-    mTexturedLitCube->setShader("LitTexturedMatrix");
+    mTexturedLitCube->setShader(&ResourceManager::LoadShader("LitTexturedMatrix"));
+
 
     // A light emissor
     Mesh* cube = new Mesh();
     cube->createCubeMeshWithNoEBO(0.15f);
     mLightEmissor->mMesh = cube;
-    mLightEmissor->initEmissionShader();
+    Shader &emissionShader = ResourceManager::LoadShader("LightEmissor");
+
+    mLightEmissor->setShader(&emissionShader);
 
     // Decide light position and color
     glm::vec3 objectColor = glm::vec3(1.0f, 0.0f, 0.0f);

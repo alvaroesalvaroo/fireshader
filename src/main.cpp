@@ -77,6 +77,8 @@ int main(int argc, char *argv[])
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        // printf("dt: %.4f | FPS: %.1f\n", deltaTime, 1.0f / deltaTime);
+
         glfwPollEvents();
 
         // manage user input

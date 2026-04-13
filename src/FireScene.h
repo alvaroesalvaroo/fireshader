@@ -8,6 +8,14 @@
 
 #include "Scene.h"
 
+struct Spark {
+    glm::vec3 acceleration = glm::vec3(0, 0, 0);
+    glm::vec3 position;
+    glm::vec3 velocity;
+    float accTimer;
+    float accUpdateRate = 1.f;
+    float lifetime;
+};
 
 class Object3D;
 class Camera3D;
@@ -21,18 +29,19 @@ public:
     void Init() override;
     void ProcessInput(float dt) override;
     void Update(float dt) override;
+
+
     void Render(float dt) override;
 
 private:
-
-    #define NUM_CUBES 6
 
     Camera3D* mCamera;
     // Object3D* mLitCube;
     Object3D* mTexturedLitCube;
     // LightEmissor* mLightEmissor;
     std::vector<LightEmissor*> mLights;
-    std::vector<int> mLightPositionsUniforms;
+    std::vector<int> mLightPositionsUniforms; // Optimización innecesaria
+    std::vector<Spark> mSparks;
 
     // NormalMapMesh* gGround = new NormalMapMesh();
     // Flame* gFlame = new Flame();
@@ -41,7 +50,5 @@ private:
     // TexturedLitCube* gSmokeAttemp = new TexturedLitCube();
     // NormalMapMesh* gSmoke = new NormalMapMesh();
 };
-
-
 
 #endif //FIRESCENE_H

@@ -23,10 +23,9 @@ class LightEmissor : public Object3D{
 public:
 
     LightEmissor() : Object3D() {
-        mLightColorUniform = -1;
     }
 
-    void initEmissionShader();
+    // void initEmissionShader();
 
     void initLightUniformIntoShader(Shader *shader, bool useShader);
     void initLightUniformIntoShader(Shader *shader, int index, bool useShader);
@@ -39,8 +38,7 @@ public:
 
     struct PointLight* getPointLight();
 private:
-    std::string mShaderName = "LightEmissor";
-    int mLightColorUniform;
+    // std::string mShaderName = "LightEmissor";
 
     struct PointLight mPointLight;
 

@@ -10,22 +10,22 @@
 #include "Camera3D.h"
 #include "Camera3D.h"
 
-void LightEmissor::initEmissionShader() {
-    // This method init a object who already has a  mShaderName
-
-    Object3D::setShader(mShaderName);
-    mShader->Use();
-
-    // Color for single light
-
-    mLightColorUniform = glGetUniformLocation(mShader->getID(), "lightColor");
-    GLenum err = glGetError();
-    if (mLightColorUniform == -1) {
-        std::cerr << "Uniform lightColor not found in " << mShaderName << std::endl;
-    }
-    glUniform3f(mLightColorUniform, mPointLight.color.x, mPointLight.color.y, mPointLight.color.z);
-
-}
+// void LightEmissor::initEmissionShader() {
+//     // This method init a object who already has a  mShaderName
+//
+//     Object3D::setShader(TODO);
+//     mShader->Use();
+//
+//     // Color for single light
+//
+//     mLightColorUniform = glGetUniformLocation(mShader->getID(), "lightColor");
+//     GLenum err = glGetError();
+//     if (mLightColorUniform == -1) {
+//         std::cerr << "Uniform lightColor not found in " << mShaderName << std::endl;
+//     }
+//     glUniform3f(mLightColorUniform, mPointLight.color.x, mPointLight.color.y, mPointLight.color.z);
+//
+// }
 
 void LightEmissor::initLightUniformIntoShader(Shader* shader, bool useShader) {
     if (useShader) shader->Use();
@@ -59,6 +59,8 @@ void LightEmissor::updateLightPositionIntoShader(Shader* shader, bool useShader)
 }
 
 void LightEmissor::updateLightPositionIntoShader(Shader *shader, int index, bool useShader) {
+    std::cout << "Metodo deprecated: updateLightPositionIntoShader for multiple lights. " << std::endl;
+
     if (useShader) shader->Use();
     std::string name = "lights[" + std::to_string(index) + "].position";
 
@@ -76,13 +78,14 @@ void LightEmissor::setLight(glm::vec3 color, float intensity, float constant, fl
     // Update ONLY THE LIGHT EMISSOR SHADER (color). We have to update the light receptors in their objects
     mShader->Use();
     // In own shader, update light color
-    glUniform3f(mLightColorUniform, color.x, color.y, color.z);
+    mShader->SetVector3f("lightColor", color);
 }
 
 void LightEmissor::setLightColor(glm::vec3 lightColor) {
     mPointLight.color = lightColor;
     // In own shader, update light color
-    glUniform3f(mLightColorUniform, mPointLight.color.x, mPointLight.color.y, mPointLight.color.z);
+    mShader->SetVector3f("lightColor", lightColor);
+
 }
 
 PointLight* LightEmissor::getPointLight() {

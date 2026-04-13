@@ -59,7 +59,7 @@ void CubesTestingScene::Init() {
         mUnlitCubes[i] = new Object3D();
         mUnlitCubes[i]->mMesh = cubeWithEBO;
         // mUnlitCubes[i]->generateCube(0.75f);
-        mUnlitCubes[i]->initShader("TextureMatrix");
+        mUnlitCubes[i]->setShader("TextureMatrix");
         mUnlitCubes[i]->setPosition(glm::vec3((float)i, -1.0f, 0.0f));
     }
     GLenum err = glGetError();
@@ -86,7 +86,7 @@ void CubesTestingScene::Init() {
     cubeWithNormals->createCubeWithNormals(0.75f);
     mLitCube->mMesh = cubeWithNormals;
 
-    mLitCube->initShader("LitColorMatrix");
+    mLitCube->setShader("LitColorMatrix");
     // Texture2D &text = ResourceManager::LoadTexture("floor", "textures/floor.jpg"); // Main texture is selected, so there is no need to open new channel
 
     // mLitCube->loadTextureFromFile(mTextureFilename);
@@ -99,13 +99,13 @@ void CubesTestingScene::Init() {
     mTexturedLitCube->mMesh = cubeWithNormalsAndUV;
     mTexturedLitCube->setTextureId(textureId);
     mTexturedLitCube->setPosition(glm::vec3(-0.0f, 0.0f, -3.0f));
-    mTexturedLitCube->initShader("LitTexturedMatrix");
+    mTexturedLitCube->setShader("LitTexturedMatrix");
 
     // A light emissor
     Mesh* cube = new Mesh();
     cube->createCubeMeshWithNoEBO(0.15f);
     mLightEmissor->mMesh = cube;
-    mLightEmissor->initLightEmissorShader();
+    mLightEmissor->initEmissionShader();
 
     // Decide light position and color
     glm::vec3 objectColor = glm::vec3(1.0f, 0.0f, 0.0f);

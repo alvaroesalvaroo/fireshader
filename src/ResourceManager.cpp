@@ -32,6 +32,10 @@ Shader &ResourceManager::LoadShader(std::string name)
     const char* fragmentPath = fPathStr.c_str();
     Shaders[name] = loadShaderFromFile(vertexPath, fragmentPath, nullptr);
     Shaders[name].mName = name.c_str();
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::cout << "Error just after loading shader: " << name << std::endl;
+    }
     return Shaders[name];
 }
 

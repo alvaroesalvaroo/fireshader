@@ -24,14 +24,15 @@ public:
 
     LightEmissor() : Object3D() {
         mLightColorUniform = -1;
-
     }
 
-    void initLightEmissorShader();
+    void initEmissionShader();
 
-    void updateLightUniformIntoShader(Shader *shader, bool useShader = false);
+    void initLightUniformIntoShader(Shader *shader, bool useShader);
+    void initLightUniformIntoShader(Shader *shader, int index, bool useShader);
 
-    void updateLightPositionIntoShader(Shader *shader, bool useShader = false);
+    void updateLightPositionIntoShader(Shader *shader, bool useShader);
+    void updateLightPositionIntoShader(Shader *shader, int index, bool useShader);
 
     void setLight(glm::vec3 color, float intensity = 1.0f, float constant = 1.f, float linear = 0.1f, float quadratic = 0.04f);
     void setLightColor(glm::vec3 lightColor);

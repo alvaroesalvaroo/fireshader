@@ -19,6 +19,7 @@
 #include "LightEmissor.h"
 #include "Material.h"
 #include "ResourceManager.h"
+#include "Spark.h"
 
 using namespace glm;
 
@@ -30,14 +31,14 @@ char const* GroundMeshFilename = "mesh/CurvedPlane2.obj";
 char const* FlameMeshFilename = "mesh/Llama";
 char const* QuadFilename = "mesh/Quad.obj";
 
-char const* GroundShaderName = "MultiLitMaterial";
+char const* GroundShaderName = "NormalmapMultilit";
 
 char const* FlameShaderName = "Flame";
 
 
 FireScene::FireScene(int width, int height) : ::Scene(width, height) {
     // mLitCube = new Object3D();
-    mTexturedLitCube = new Object3D();
+    // mTexturedLitCube = new Object3D();
     mLightPositionsUniforms.clear();
     mLights.clear();
     mCamera = new Camera3D(2.f, 5.f, 45.0f);
@@ -47,10 +48,7 @@ FireScene::FireScene(int width, int height) : ::Scene(width, height) {
 FireScene::~FireScene() {
 }
 
-#define SPARKS_NUMBER 5
-#define SPARKS_RANDOMNESS 12.0f
-#define TIME_TO_UPDATE_SPARKS 1.f
-float timeSinceUpdateSparks = 0;
+#define SPARKS_NUMBER 10
 
 void FireScene::Init() {
 
@@ -58,19 +56,12 @@ void FireScene::Init() {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     Mesh* cubeMesh = new Mesh();
-    cubeMesh->createCubeMeshWithNoEBO(0.1);
+    cubeMesh->createCubeMeshWithNoEBO(0.01);
     // TWO LIGHTS
 
     for (int i = 0; i < SPARKS_NUMBER; i++) {
-        LightEmissor* lightEmissor = new LightEmissor();
-        mLights.push_back(lightEmissor);
-        Spark newSpark;
-        glm::vec3 randomVel = glm::vec3(
-        ((rand() / (float)RAND_MAX) * 2.0f - 1.0f) * SPARKS_RANDOMNESS,
-        0.0f,
-        ((rand() / (float)RAND_MAX) * 2.0f - 1.0f) * SPARKS_RANDOMNESS);
-        newSpark.velocity = randomVel;
-        mSparks.push_back(newSpark);
+        Spark* spark = new Spark();
+        mLights.push_back(spark);
 
     }
     // LightEmissor* lightEmissor = new LightEmissor();
@@ -82,7 +73,6 @@ void FireScene::Init() {
 
     // Decide light position and color
     //glm::vec3 someColor = glm::vec3(1.0f, 0.0f, 0.0f);
-    glm::vec3 lightPosition = glm::vec3(1.0f, -0.0f, -1.0f);
     glm::vec3 lightColor = glm::vec3(1, 0.7, 0);
 
 
@@ -108,12 +98,9 @@ void FireScene::Init() {
     Shader &emissionShader = ResourceManager::LoadShader("LightEmissor");
     // Point Lights
     for (int i = 0; i < mLights.size(); i++) {
-        // 1. Datos puros, sin GL
         mLights[i]->mMesh = cubeMesh;
-        mLights[i]->setPosition(lightPosition);
         // Shader emissive
         mLights[i]->setShader(&emissionShader);
-        // Both emissive (color) and receptive (setups uniform)
         mLights[i]->setLight(lightColor, 1, 1.0, 0.1, 2);  // Solo asigna mPointLight, sin GL todavía
 
         // Shader receptor
@@ -213,58 +200,14 @@ void FireScene::Render(float dt) {
 
 
 
-
-void updateSpark(Spark &spark, float dt) {
-
-    const float speedY        = 1.2f;
-    const float noiseStrength = 800.f;
-    const float damping       = 0.6f;
-    const float maxY = 3.0f;
-
-    spark.accTimer += dt;
-    if (spark.accTimer >= spark.accUpdateRate) {
-        spark.accTimer = 0;
-        spark.accUpdateRate = 1.f + (rand() / (float)RAND_MAX);
-        // std::cout << "update spark acc" << std::endl;
-
-        glm::vec3 randomAccel = glm::vec3(
-            ((rand() / (float)RAND_MAX) * 2.0f - 1.0f) * noiseStrength,
-            0.0f,
-            ((rand() / (float)RAND_MAX) * 2.0f - 1.0f) * noiseStrength
-        );
-        spark.acceleration = randomAccel;
-    }
-
-    spark.velocity.x = spark.velocity.x * damping + spark.acceleration.x * dt;
-    spark.velocity.y = speedY;
-    spark.velocity.z = spark.velocity.z * damping + spark.acceleration.z * dt;
-
-    spark.position += spark.velocity * dt;
-    spark.lifetime += dt;
-
-    if (spark.position.y > maxY) {
-        spark.position = glm::vec3(0.0f);
-        spark.velocity = glm::vec3(rand() / (float)RAND_MAX, 0.0f, rand() / (float)RAND_MAX);
-        spark.lifetime = 0.0f;
-    }
-}
-
 #define PI 3.14159265
 float totalTime = 0;
 
 void FireScene::Update(float dt) {
     totalTime += dt;
-    // glm::vec3 lightPosition = glm::vec3(0.3f + cos(totalTime), 0.5, 2 * sin(totalTime));
-    // glm::vec3 lightPosition2 = glm::vec3(0.3f + cos(totalTime + PI), 0.5, 2 * sin(totalTime + PI));
-    // mLights[0]->setPosition(lightPosition);
-    // mLights[1]->setPosition(lightPosition2);
 
-
-    // TODO: Chispas
-
-    for (int i = 0; i < mSparks.size(); i++) {
-        updateSpark(mSparks[i], dt);
-        mLights[i]->setPosition(mSparks[i].position);
+    for (int i = 0; i < mLights.size(); i++) {
+        mLights[i]->update(dt); // Since theyre sparks, update method is override
     }
 
     mCamera->turn(mouseDeltaX, mouseDeltaY, dt);

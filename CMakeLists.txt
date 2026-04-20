@@ -74,6 +74,10 @@ set(SOURCE_FILES
         src/FireScene.h
         src/Material.cpp
         src/Material.h
+#        src/ParticleManager.cpp
+#        src/ParticleManager.h
+        src/Spark.cpp
+        src/Spark.h
 
 )
 

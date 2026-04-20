@@ -25,6 +25,7 @@ Object3D::Object3D() {
     mScale = glm::vec3(1.0f);
     mShader = nullptr;
     mTexture = -1;
+    mTexture2 = -1;
     mUniformModel = -1;
     mMesh = nullptr;
 }
@@ -35,7 +36,7 @@ Object3D::~Object3D()
 }
 
 // Classical transform update. Not doing anything since the goal is to become a shader master
-void Object3D::update(double deltaTime) {
+void Object3D::update(float dt) {
 
 }
 
@@ -57,7 +58,7 @@ void Object3D::setShader(Shader *shader) {
 
 
 
-void Object3D::render(double deltaTime, Camera3D *camera) {
+void Object3D::render(float dt, Camera3D *camera) {
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   // Handly debug
 
@@ -66,7 +67,10 @@ void Object3D::render(double deltaTime, Camera3D *camera) {
     camera->updateViewUniform(mUniformView);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mTexture);
-
+    if (mTexture2 != -1) {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, mTexture2);
+    }
     //Do matrix model movements
     glm::mat4 transformMatrix = glm::mat4();
     transformMatrix = glm::translate(transformMatrix, mPosition);

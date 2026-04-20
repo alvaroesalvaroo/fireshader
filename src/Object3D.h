@@ -20,10 +20,11 @@ public:
     virtual ~Object3D();
     // int loadTextureFromFile(char const* filename);
     void setTextureId(int textureId) {mTexture = textureId;}
+    void setSecondaryTextureId(int textureId2) {mTexture2 = textureId2;}
 
-    virtual void render(double deltaTime, Camera3D *camera);
+    virtual void render(float dt, Camera3D *camera);
 
-    virtual void update(double deltaTime); // The goal is not to use it (very much)
+    virtual void update(float dt); // The goal is not to use it (very much)
     virtual void setPosition(glm::vec3 position);
     void setRotation(glm::vec3 rotationAxis, float angle);
     void setScale(glm::vec3 scale);
@@ -34,6 +35,7 @@ public:
 protected:
     std::string mShaderName;
     GLuint mTexture;
+    GLuint mTexture2;
     // int mTextureIndex;
     // bool mIsTransparent;
 

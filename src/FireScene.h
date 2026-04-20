@@ -8,15 +8,8 @@
 
 #include "Scene.h"
 
-struct Spark {
-    glm::vec3 acceleration = glm::vec3(0, 0, 0);
-    glm::vec3 position;
-    glm::vec3 velocity;
-    float accTimer;
-    float accUpdateRate = 1.f;
-    float lifetime;
-};
 
+class Spark;
 class Object3D;
 class Camera3D;
 class LightEmissor;
@@ -37,11 +30,11 @@ private:
 
     Camera3D* mCamera;
     // Object3D* mLitCube;
-    Object3D* mTexturedLitCube;
+    // Object3D* mTexturedLitCube;
     // LightEmissor* mLightEmissor;
     std::vector<LightEmissor*> mLights;
     std::vector<int> mLightPositionsUniforms; // Optimización innecesaria
-    std::vector<Spark> mSparks;
+    // std::vector<Spark*> mSparks;
 
     // NormalMapMesh* gGround = new NormalMapMesh();
     // Flame* gFlame = new Flame();

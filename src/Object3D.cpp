@@ -72,7 +72,7 @@ void Object3D::render(float dt, Camera3D *camera) {
         glBindTexture(GL_TEXTURE_2D, mTexture2);
     }
     //Do matrix model movements
-    glm::mat4 transformMatrix = glm::mat4();
+    glm::mat4 transformMatrix = glm::mat4(1.0f);
     transformMatrix = glm::translate(transformMatrix, mPosition);
     // Rotation with quaternion:
     transformMatrix = transformMatrix * glm::mat4_cast(mRotation);
@@ -96,78 +96,12 @@ void Object3D::render(float dt, Camera3D *camera) {
 void Object3D::setPosition(glm::vec3 position) {
     mPosition = position;
 }
+void Object3D::setPosition(float px, float py, float pz) {
+    mPosition = glm::vec3(px, py, pz);
+}
 void Object3D::setRotation(glm::vec3 rotationAxis, float angle) {
     mRotation = glm::angleAxis(glm::radians(angle), rotationAxis);
 }
 void Object3D::setScale(glm::vec3 scale) {
     mScale = scale;
 }
-
-//
-// int Object3D::loadTextureFromFile(char const *filename) {
-//
-//     std::cerr << "Call to legacy Object3D::loadTextureFromFile. Call aborted" << std::endl;
-//     return;
-//     GLenum TEXTURE0 = GL_TEXTURE0;
-//     mShader->Use();
-//     glGenTextures(1, &mTexture);
-//
-//     // Bind texture with index 0
-//     glActiveTexture(TEXTURE0);
-//     glBindTexture(GL_TEXTURE_2D, mTexture);
-//
-//     FILE* f = fopen(filename, "rb");
-//     if(!f) { std::cerr << "File " << filename << " not found "<<std::endl; }
-//     else { fclose(f); }
-//
-//     // Load file
-//     int width, height, nrChannels;
-//     stbi_set_flip_vertically_on_load(true);
-//     unsigned char *pixels = stbi_load(filename, &width, &height, &nrChannels, 0);
-//
-//     if (!pixels) {
-//         std::cerr << "stbi error loading " << filename << "  reason is " << stbi_failure_reason() <<std::endl;
-//         // printf("Failed to load texture: %s\n", stbi_failure_reason());
-//         return -1;
-//     }
-//
-//     GLenum err = glGetError();
-//     if (err != GL_NO_ERROR) {
-//         std::cerr << "GLError loading " << filename << ": " << err << std::endl;
-//     }
-//
-//
-//
-//     printf("Texture %s loaded with nChannels: %d, textureID %d\n", filename, nrChannels, mTexture);
-//
-//     GLint Mode = 0;
-//     if (nrChannels == 3) {
-//         Mode = GL_RGB;
-//     }
-//     else if (nrChannels == 4) {
-//         Mode = GL_RGBA;
-//         // mIsTransparent = true;
-//     }
-//         //type, mipmaplevel, internalformat, width, height, border (always 0), format, type, pixelsdata
-//     glTexImage2D(GL_TEXTURE_2D, 0, Mode, width, height, 0, Mode, GL_UNSIGNED_BYTE, pixels);
-//     err = glGetError();
-//     if (err != GL_NO_ERROR) {
-//         std::cerr << "Error in glTexImage2D with filename " << filename << "  reason is "<< stbi_failure_reason() <<std::endl;
-//     }
-//     glGenerateMipmap(GL_TEXTURE_2D);
-//
-//
-//     // Wrapping mode in both direction
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//     // Scaling modes
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//
-//     // Cleaning
-//     glBindTexture(GL_TEXTURE_2D, 0);
-//     stbi_image_free(pixels);
-//
-//     return mTexture;
-// }
-

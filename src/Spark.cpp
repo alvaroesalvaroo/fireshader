@@ -5,16 +5,26 @@
 #include "Spark.h"
 
 Spark::Spark() {
-    // RandomVel
-    glm::vec3 randomVel = glm::vec3(
-    ((rand() / static_cast<float>(RAND_MAX)) * 2.0f - 1.0f) * SPARKS_RANDOMNESS,
-    0.0f,
-    ((rand() / static_cast<float>(RAND_MAX)) * 2.0f - 1.0f) * SPARKS_RANDOMNESS);
-    this->mVelocity = randomVel;
+    this->mVelocity = glm::vec3(0.0f, 0.0f, 0.0f);
+    reset();
+}
 
+const float SPARKS_RANDOMNESS = 12.0f;
+const float SPARKS_SYSTEM_RADIUS = 0.3f;;
+
+void Spark::reset() {
+    // RandomVel on Y
     this->mVelocity.y = mBaseYSpeed *( 1.3 - 0.6 * (rand() / static_cast<float>(RAND_MAX)));
 
-    this->mPosition = glm::vec3(rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX));
+    this->mLifetime = 0.0f;
+
+    this->mPosition = glm::vec3(rand() / static_cast<float>(RAND_MAX),
+                                -0.3,
+                                rand() / static_cast<float>(RAND_MAX))
+                                * SPARKS_SYSTEM_RADIUS;
+
+    this->mVelocity = glm::vec3(rand() / (float)RAND_MAX, this->mVelocity.y, rand() / (float)RAND_MAX);
+
 }
 
 void Spark::update(float dt) {
@@ -41,9 +51,6 @@ void Spark::update(float dt) {
     this->mLifetime += dt;
 
     if (this->mPosition.y > maxY) {
-        this->mPosition = this->mPosition = 0.1f * glm::vec3(rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX));
-
-        this->mVelocity = glm::vec3(rand() / (float)RAND_MAX, this->mVelocity.y, rand() / (float)RAND_MAX);
-        this->mLifetime = 0.0f;
+        reset();
     }
 }

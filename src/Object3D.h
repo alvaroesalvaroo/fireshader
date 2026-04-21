@@ -26,16 +26,21 @@ public:
 
     virtual void update(float dt); // The goal is not to use it (very much)
     virtual void setPosition(glm::vec3 position);
+
+    void setPosition(float px, float py, float pz);
+
     void setRotation(glm::vec3 rotationAxis, float angle);
     void setScale(glm::vec3 scale);
     glm::vec3 getPosition() {return mPosition;}
     void setShader(Shader *shader);
-    Mesh* mMesh;
+    void setMesh(Mesh *mesh) {mMesh = mesh;}
 
 protected:
+    Mesh* mMesh;
+
     std::string mShaderName;
-    GLuint mTexture;
-    GLuint mTexture2;
+    GLint mTexture;
+    GLint mTexture2;
     // int mTextureIndex;
     // bool mIsTransparent;
 

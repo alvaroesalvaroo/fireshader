@@ -7,13 +7,14 @@
 #include "LightEmissor.h"
 #include "detail/type_vec.hpp"
 
-#define SPARKS_RANDOMNESS 12.0f
-#define TIME_TO_UPDATE_SPARKS 1.f
-// float timeSinceUpdateSparks = 0;
+
 
 class Spark : public LightEmissor{
 public:
     Spark();
+
+    void reset();
+
     void update(float dt) override;
 
     glm::vec3 mAcceleration = glm::vec3(0, 0, 0);

@@ -59,7 +59,7 @@ void CubesTestingScene::Init() {
 
     for (int i = 0; i < NUM_CUBES; i++) {
         mUnlitCubes[i] = new Object3D();
-        mUnlitCubes[i]->mMesh = cubeWithEBO;
+        mUnlitCubes[i]->setMesh(cubeWithEBO);
         // mUnlitCubes[i]->generateCube(0.75f);
         mUnlitCubes[i]->setShader(&unlitShader);
         mUnlitCubes[i]->setPosition(glm::vec3((float)i, -1.0f, 0.0f));
@@ -86,7 +86,7 @@ void CubesTestingScene::Init() {
     // A single colored lit cube
     Mesh* cubeWithNormals= new Mesh();
     cubeWithNormals->createCubeWithNormals(0.75f);
-    mLitCube->mMesh = cubeWithNormals;
+    mLitCube->setMesh(cubeWithNormals);
 
     mLitCube->setShader(&ResourceManager::LoadShader("LitColorMatrix"));
     // Texture2D &text = ResourceManager::LoadTexture("floor", "textures/floor.jpg"); // Main texture is selected, so there is no need to open new channel
@@ -98,7 +98,7 @@ void CubesTestingScene::Init() {
     // A cool textured lit cube
     Mesh* cubeWithNormalsAndUV = new Mesh();
     cubeWithNormalsAndUV->createCubeWithNormalsAndUV(2.f);
-    mTexturedLitCube->mMesh = cubeWithNormalsAndUV;
+    mTexturedLitCube->setMesh(cubeWithNormalsAndUV);
     mTexturedLitCube->setTextureId(textureId);
     mTexturedLitCube->setPosition(glm::vec3(-0.0f, 0.0f, -3.0f));
     mTexturedLitCube->setShader(&ResourceManager::LoadShader("LitTexturedMatrix"));
@@ -107,7 +107,7 @@ void CubesTestingScene::Init() {
     // A light emissor
     Mesh* cube = new Mesh();
     cube->createCubeMeshWithNoEBO(0.15f);
-    mLightEmissor->mMesh = cube;
+    mLightEmissor->setMesh(cube);
     Shader &emissionShader = ResourceManager::LoadShader("LightEmissor");
 
     mLightEmissor->setShader(&emissionShader);

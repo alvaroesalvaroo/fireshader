@@ -44,13 +44,13 @@ Shader &ResourceManager::GetShader(std::string name)
     return Shaders[name];
 }
 
-Texture2D &ResourceManager::LoadTexture(const char* name, const char* path)
+Texture2D &ResourceManager::LoadTexture(const char* name, const char* path, bool alpha)
 {
     auto it = Textures.find(name);
     if (it != Textures.end()) {
         return it->second; // it->second es el objeto Textures
     }
-    Textures[name] = loadTextureFromFile(path, false);
+    Textures[name] = loadTextureFromFile(path, alpha);
     return Textures[name];
 }
 
@@ -132,6 +132,7 @@ Texture2D ResourceManager::loadTextureFromFile(const char *path, bool alpha)
     if (data == nullptr) {
         std::cerr<<"Error loading texture from " << path << ". Data is null" << std::endl;
     }
+
     // now generate texture
     texture.Generate(width, height, data);
     if (texture.ID <= 0) {

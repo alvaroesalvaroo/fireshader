@@ -333,7 +333,7 @@ void Mesh::generatePlane(float size) {
     mUseEBO = true;
     // El stride será de 8
 
-    const int dataSize = 8 * 6 * 1; // Solo una cara
+    const int dataSize = 8 * 4 ; // Solo una cara
     float vertices[dataSize] = {
         // x, y, z,         // Normals            // u, v,
         -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f, 0.0f, 0.0f,

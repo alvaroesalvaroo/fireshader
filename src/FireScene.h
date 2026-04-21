@@ -29,15 +29,12 @@ public:
 private:
 
     Camera3D* mCamera;
-    // Object3D* mLitCube;
-    // Object3D* mTexturedLitCube;
-    // LightEmissor* mLightEmissor;
-    std::vector<LightEmissor*> mLights;
-    std::vector<int> mLightPositionsUniforms; // Optimización innecesaria
-    // std::vector<Spark*> mSparks;
 
-    // NormalMapMesh* gGround = new NormalMapMesh();
-    // Flame* gFlame = new Flame();
+    std::vector<LightEmissor*> mLights; // They will be initialized as "sparks"
+
+    std::vector<int> mLightPositionsUniforms; // Optimización innecesaria
+
+    Object3D* mSmoke;
     Object3D* mGround;
 
     // TexturedLitCube* gSmokeAttemp = new TexturedLitCube();

@@ -51,7 +51,11 @@ void Shader::SetFloat(const char *name, float value, bool useShader)
 {
     if (useShader)
         this->Use();
-    glUniform1f(glGetUniformLocation(this->ID, name), value);
+    GLint location = glGetUniformLocation(this->ID, name);
+    if (location == -1) {
+        std::cerr << "Error in glGetUniformLocation of float: " << name <<std::endl;
+    }
+    glUniform1f(location, value);
 }
 void Shader::SetInteger(const char *name, int value, bool useShader)
 {
@@ -142,7 +146,7 @@ void Shader::SetTexture(const char *uniformName, bool useShader, GLuint channel)
     GLint location = glGetUniformLocation(this->ID, uniformName);
 
     if (location == -1) {
-        std::cerr << "Error in glGetUniformLocation of sampler2D: " << uniformName << std::endl;
+        std::cerr << "Error in glGetUniformLocation of sampler2D: " << uniformName << "for shader " << mName << std::endl;
         return;
     }
 

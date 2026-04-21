@@ -26,11 +26,13 @@ using namespace glm;
 char const* GroundTextureFilename = "textures/rocky_gravel_diff_1k.jpg";
 char const* GroundNormalTextureFilename = "textures/rocky_gravel_nor_gl_1k.jpg";
 char const* SmokeTextureName = "textures/smokeRGBA.png";
+char const* NoiseTextureName = "textures/perlin.png";
 
 char const* GroundMeshFilename = "mesh/CurvedPlane2.obj";
 char const* FlameMeshFilename = "mesh/Llama";
 char const* QuadFilename = "mesh/Quad.obj";
 
+char const* SmokeShaderName = "BillboardNoise";
 char const* GroundShaderName = "NormalmapMultilit";
 
 char const* FlameShaderName = "Flame";
@@ -48,57 +50,53 @@ FireScene::FireScene(int width, int height) : ::Scene(width, height) {
 FireScene::~FireScene() {
 }
 
-#define SPARKS_NUMBER 10
+#define SPARKS_NUMBER 15
 
 void FireScene::Init() {
 
     // Handly debug
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    // ====== GROUND ====== //
+    Mesh* groundMesh = new Mesh();
+    groundMesh->loadMeshFromFile(GroundMeshFilename);
+    mGround->setMesh(groundMesh);
+
+    Shader& litShader = ResourceManager::LoadShader(GroundShaderName);
+    mGround->setShader(&litShader);
+
+    // Ground texture
+    Texture2D& groundTex = ResourceManager::LoadTexture("ground", GroundTextureFilename);
+    litShader.SetTexture("textura", true, 0);
+    mGround->setTextureId(groundTex.ID);
+
+    // Normal map texture
+    Texture2D& normalTex = ResourceManager::LoadTexture("normal", GroundNormalTextureFilename);
+    litShader.SetTexture("normalMap", true, 1);
+    mGround->setSecondaryTextureId(normalTex.ID); // Commenting this gives funny results
+
+    // Ground material
+    Material* mat = new Material(0.1f, 0.8f, 0.2f);
+    mat->updateMaterialToShader(&ResourceManager::GetShader(GroundShaderName));
+
+    mGround->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    // Link lit shader with camera and lights
+
+    litShader.SetVector3f("viewPosition", mCamera->getPosition());
+
+    // ===== SPARKS ======= //
     Mesh* cubeMesh = new Mesh();
     cubeMesh->createCubeMeshWithNoEBO(0.01);
-    // TWO LIGHTS
-
     for (int i = 0; i < SPARKS_NUMBER; i++) {
         Spark* spark = new Spark();
         mLights.push_back(spark);
-
+        mLights[i]->setMesh(cubeMesh);
     }
-    // LightEmissor* lightEmissor = new LightEmissor();
-    // LightEmissor* lightEmissor2 = new LightEmissor();
-    // mLights.push_back(lightEmissor);
-    // mLights.push_back(lightEmissor2);
-
-    GLenum err = glGetError();
-
-    // Decide light position and color
-    //glm::vec3 someColor = glm::vec3(1.0f, 0.0f, 0.0f);
-    glm::vec3 lightColor = glm::vec3(1, 0.7, 0);
-
-
-    // Ground
-    Mesh* groundMesh = new Mesh();
-    groundMesh->loadMeshFromFile(GroundMeshFilename);
-    mGround->mMesh = groundMesh;
-    err = glGetError();
-
-    Shader& litShader = ResourceManager::LoadShader(GroundShaderName);
-
-    mGround->setShader(&litShader);
-
-    // mGround->setIllumination(mLightEmissor->getPointLight(), GroundShaderName);
-    err = glGetError();
-
-    // mGround->loadTextureFromFile(GroundTextureFilename, 1);
-    Texture2D& groundTex = ResourceManager::LoadTexture("ground", GroundTextureFilename);
-
-    litShader.SetTexture("textura", true, 0);
-    litShader.SetVector3f("viewPosition", mCamera->getPosition());
-
     Shader &emissionShader = ResourceManager::LoadShader("LightEmissor");
-    // Point Lights
+
+    // Setup lights
+    glm::vec3 lightColor = glm::vec3(1, 0.7, 0);
     for (int i = 0; i < mLights.size(); i++) {
-        mLights[i]->mMesh = cubeMesh;
         // Shader emissive
         mLights[i]->setShader(&emissionShader);
         mLights[i]->setLight(lightColor, 1, 1.0, 0.1, 2);  // Solo asigna mPointLight, sin GL todavía
@@ -113,36 +111,35 @@ void FireScene::Init() {
     // Importante: light count en el receptor
     litShader.SetInteger("lightCount", mLights.size(), true);
 
+    // AUX LIGHT
+    // LightEmissor* lightEmissor = new LightEmissor();
+    // LightEmissor* lightEmissor2 = new LightEmissor();
+    // mLights.push_back(lightEmissor);
+    // mLights.push_back(lightEmissor2);
 
+    // ==== SMOKE ===== //
+    mSmoke = new Object3D();
+    mSmoke->setPosition(0.f, 0.f, 0.f);
 
-    // mGround->loadNormalTexture(GroundNormalTextureFilename);
-    mGround->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-    mGround->setTextureId(groundTex.ID);
+    Mesh* plane = new Mesh();
+    plane->generatePlane(1);
+    mSmoke->setMesh(plane);
+    Shader& smokeShader = ResourceManager::LoadShader(SmokeShaderName);
+    mSmoke->setShader(&smokeShader);
+    Texture2D& smokeTex = ResourceManager::LoadTexture("smoke", SmokeTextureName, true);
+    smokeShader.SetTexture("billboardTex", true, 0);
+    mSmoke->setTextureId(smokeTex.ID);
 
-    Material* mat = new Material(0.1f, 0.8f, 0.4f);
-    mat->updateMaterialToShader(&ResourceManager::GetShader(GroundShaderName));
+    Texture2D& noiseTex = ResourceManager::LoadTexture("noise", NoiseTextureName, true);
+    smokeShader.SetTexture("noiseTex", true, 1);
+    mSmoke->setSecondaryTextureId(noiseTex.ID);
+    // glBindTexture(GL_TEXTURE_2D, noiseTex.ID);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // glBindTexture(GL_TEXTURE_2D, 0);
+    smokeShader.SetFloat("time", 0); // Init time uniform
 
-
-    // gSmoke->loadMeshFromFile(QuadFilename);
-    // gSmoke->setIllumination(gLightEmissor->getPointLight(), GroundShaderName);
-    //gSmoke->loadSmokeTexture(SmokeTextureName);
-    // gSmoke->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-
-    /*
-    // Flames
-    gFlame->loadFlamesData(FlameMeshFilename, 3);
-    //gFlame->initShader(FlameShaderName);
-    gFlame->setPosition(glm::vec3(0.0f, 1.0f, 1.0f));
-    gFlame->initShader("LightEmissor");*/
-    /*
-    // Smoke with plane
-    gSmokeAttemp->generateCube(1.0f);
-    gSmokeAttemp->initKnownShader();
-    gSmokeAttemp->loadSmokeTexture(SmokeTextureName);  // returns an id if needed
-    gSmokeAttemp->setIlumination(gLightEmissor->getPointLight()->diffuse, gLightEmissor->getPointLight()->position);
-    */
-
-    err = glGetError();
+    GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
         std::cerr << "GLError initing scene: " << err << std::endl;
         return;
@@ -164,6 +161,7 @@ void FireScene::ProcessInput(float dt) {
     mCamera->updatePosition(moveArray, dt);
 }
 
+float totalTime = 0;
 
 void FireScene::Render(float dt) {
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -193,15 +191,17 @@ void FireScene::Render(float dt) {
 
     mGround->render(dt, mCamera);
 
-    //gFlame->render(time, deltaTime, mCamera);
-    // gSmokeAttemp->updateLightPositions(mLightEmissor->getPointLight()->position);
-    // gSmokeAttemp->render(dt, mCamera);
+    // Billboard
+    glDepthMask(GL_FALSE);        // no escribe en depth buffer
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    ResourceManager::GetShader(SmokeShaderName).SetFloat("time", totalTime, true);
+    mSmoke->render(dt, mCamera);
+    glDepthMask(GL_TRUE);         // restaurar
 }
 
-
-
 #define PI 3.14159265
-float totalTime = 0;
+
 
 void FireScene::Update(float dt) {
     totalTime += dt;

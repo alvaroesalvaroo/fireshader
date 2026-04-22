@@ -82,29 +82,6 @@ void FireScene::Init() {
     }
     Shader &emissionShader = ResourceManager::LoadShader("LightEmissor");
 
-    // Setup lights
-    glm::vec3 lightColor = glm::vec3(1, 0.7, 0);
-    for (int i = 0; i < mLights.size(); i++) {
-        // Shader emissive
-        mLights[i]->setShader(&emissionShader);
-        mLights[i]->setLight(lightColor, 1, 1.0, 0.1, 2);  // Solo asigna mPointLight, sin GL todavía
-
-        // Shader receptor
-        mLights[i]->initLightUniformIntoShader(&litShader, i, true);
-        // Cachear uniforms de light position, se usan mucho en el render
-        std::string uniformName = "lights[" + std::to_string(i) + "].position";
-        GLint positionUniform = glGetUniformLocation(litShader.getID(), uniformName.c_str());
-        mLightPositionsUniforms.push_back(positionUniform);
-    }
-    // Importante: light count en el receptor
-    litShader.SetInteger("lightCount", mLights.size(), true);
-
-    // AUX LIGHT
-    // LightEmissor* lightEmissor = new LightEmissor();
-    // LightEmissor* lightEmissor2 = new LightEmissor();
-    // mLights.push_back(lightEmissor);
-    // mLights.push_back(lightEmissor2);
-
     // ==== SMOKE ===== //
     mSmoke = new Object3D();
     mSmoke->setPosition(0.f, 0.25f, 0.f);
@@ -112,8 +89,10 @@ void FireScene::Init() {
     Mesh* plane = new Mesh();
     plane->generatePlane(1);
     mSmoke->setMesh(plane);
+
     Shader& smokeShader = ResourceManager::LoadShader(SmokeShaderName);
     mSmoke->setShader(&smokeShader);
+
     Texture2D& smokeTex = ResourceManager::LoadTexture("smoke", SmokeTextureName);
     smokeShader.SetTexture("billboardTex", true, 0);
     mSmoke->setTextureId(smokeTex.ID);
@@ -121,12 +100,36 @@ void FireScene::Init() {
     Texture2D& noiseTex = ResourceManager::LoadTexture("noise", NoiseTextureName);
     smokeShader.SetTexture("noiseTex", true, 1);
     mSmoke->setSecondaryTextureId(noiseTex.ID);
-    // glBindTexture(GL_TEXTURE_2D, noiseTex.ID);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // glBindTexture(GL_TEXTURE_2D, 0);
+
     smokeShader.SetFloat("time", 0); // Init time uniform
 
+    // ====== SETUP LIGHTS ====== //
+    glm::vec3 lightColor = glm::vec3(1, 0.7, 0);
+    for (int i = 0; i < mLights.size(); i++) {
+        // Shader emissive
+        mLights[i]->setShader(&emissionShader);
+        mLights[i]->setLight(lightColor, 1, 1.0, 0.1, 2);  // Solo asigna mPointLight, sin GL todavía
+
+        // Shaders receptores
+        mLights[i]->initLightUniformIntoShader(&litShader, i, true);
+        // Cachear uniforms de light position, se usan mucho en el render
+        std::string uniformName = "lights[" + std::to_string(i) + "].position";
+        GLint positionUniform = glGetUniformLocation(litShader.getID(), uniformName.c_str());
+        mLightPositionsUniforms.push_back(positionUniform);
+
+    }
+    // Light count en los receptores!
+    litShader.SetInteger("lightCount", mLights.size(), true);
+    smokeShader.SetInteger("lightCount", mLights.size(), true);
+
+    // AUX LIGHT
+    // LightEmissor* lightEmissor = new LightEmissor();
+    // LightEmissor* lightEmissor2 = new LightEmissor();
+    // mLights.push_back(lightEmissor);
+    // mLights.push_back(lightEmissor2);
+
+
+    // =============== //
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
         std::cerr << "GLError initing scene: " << err << std::endl;
@@ -174,7 +177,15 @@ void FireScene::Render(float dt) {
         // Optimización (practicamente imperceptible)
         glm::vec3 lightPos = mLights[i]->getPosition();
         glUniform3f(mLightPositionsUniforms[i], lightPos.x, lightPos.y, lightPos.z);
+    }
+    Shader& smokeShader = ResourceManager::GetShader(SmokeShaderName);
+    smokeShader.Use();
+    for (int i = 0; i < mLights.size(); i++) {
+        std::string uniformName = "lightPositions[" + std::to_string(i) + "]";
 
+        smokeShader.SetVector3f(uniformName.c_str(), mLights[i]->getPosition());
+        // glm::vec3 lightPos = mLights[i]->getPosition();
+        // glUniform3f(mLightPositionsUniforms[i], lightPos.x, lightPos.y, lightPos.z);
     }
 
     mGround->render(dt, mCamera);
@@ -195,7 +206,7 @@ void FireScene::Update(float dt) {
     totalTime += dt;
 
     for (int i = 0; i < mLights.size(); i++) {
-        mLights[i]->update(dt); // Since theyre sparks, update method is override
+        mLights[i]->update(dt); // Since they are sparks, update method is overridden
     }
 
     mCamera->turn(mouseDeltaX, mouseDeltaY, dt);

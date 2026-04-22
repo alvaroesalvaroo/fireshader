@@ -53,7 +53,7 @@ void Shader::SetFloat(const char *name, float value, bool useShader)
         this->Use();
     GLint location = glGetUniformLocation(this->ID, name);
     if (location == -1) {
-        std::cerr << "Error in glGetUniformLocation of float: " << name <<std::endl;
+        std::cerr << "Error in glGetUniformLocation of float: " << name << " in shader "<< this->mName <<std::endl;
     }
     glUniform1f(location, value);
 }
@@ -63,7 +63,7 @@ void Shader::SetInteger(const char *name, int value, bool useShader)
         this->Use();
     GLint location = glGetUniformLocation(this->ID, name);
     if (location == -1) {
-        std::cerr << "Error in glGetUniformLocation of integer: " << name <<std::endl;
+        std::cerr << "Error in glGetUniformLocation of integer: " << name << " in shader "<< this->mName <<std::endl;
     }
     glUniform1i(location, value);
 }
@@ -103,7 +103,7 @@ void Shader::SetVector3f(const char *name, const glm::vec3 &value, bool useShade
         this->Use();
     GLint location = glGetUniformLocation(this->ID, name);
     if (location == -1) {
-        std::cerr << "Error in glGetUniformLocation of vector3: " << name <<std::endl;
+        std::cerr << "Error in glGetUniformLocation of vector3: " << name << " in shader "<< this->mName <<std::endl;
     }
     glUniform3f(location, value.x, value.y, value.z);
 }
@@ -113,7 +113,7 @@ void Shader::SetVector4f(const char *name, float x, float y, float z, float w, b
         this->Use();
     GLint location = glGetUniformLocation(this->ID, name);
     if (location == -1) {
-        std::cerr << "Error in glGetUniformLocation of vector4: " << name <<std::endl;
+        std::cerr << "Error in glGetUniformLocation of vector4: " << name << " in shader "<< this->mName <<std::endl;
     }
     glUniform4f(location, x, y, z, w);
 }
@@ -123,7 +123,7 @@ void Shader::SetVector4f(const char *name, const glm::vec4 &value, bool useShade
         this->Use();
     GLint location = glGetUniformLocation(this->ID, name);
     if (location == -1) {
-        std::cerr << "Error in glGetUniformLocation of vector4: " << name <<std::endl;
+        std::cerr << "Error in glGetUniformLocation of vector4: " << name << " in shader "<< this->mName <<std::endl;
     }
     glUniform4f(location, value.x, value.y, value.z, value.w);
 }

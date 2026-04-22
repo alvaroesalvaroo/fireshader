@@ -44,13 +44,13 @@ Shader &ResourceManager::GetShader(std::string name)
     return Shaders[name];
 }
 
-Texture2D &ResourceManager::LoadTexture(const char* name, const char* path, bool alpha)
+Texture2D &ResourceManager::LoadTexture(const char* name, const char* path)
 {
     auto it = Textures.find(name);
     if (it != Textures.end()) {
-        return it->second; // it->second es el objeto Textures
+        return it->second; // it->second es el objeto Texture
     }
-    Textures[name] = loadTextureFromFile(path, alpha);
+    Textures[name] = loadTextureFromFile(path);
     return Textures[name];
 }
 
@@ -117,20 +117,30 @@ Shader ResourceManager::loadShaderFromFile(std::string vShaderFile, std::string 
     return shader;
 }
 
-Texture2D ResourceManager::loadTextureFromFile(const char *path, bool alpha)
+Texture2D ResourceManager::loadTextureFromFile(const char *path)
 {
     // create texture object
-    Texture2D texture;
-    if (alpha)
-    {
-        texture.Internal_Format = GL_RGBA;
-        texture.Image_Format = GL_RGBA;
-    }
+
     // load image
     int width, height, nrChannels;
     unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
     if (data == nullptr) {
         std::cerr<<"Error loading texture from " << path << ". Data is null" << std::endl;
+    }
+
+    Texture2D texture;
+    if (nrChannels == 4) {
+        texture.Internal_Format = GL_RGBA;
+        texture.Image_Format    = GL_RGBA;
+    } else if (nrChannels == 3) {
+        texture.Internal_Format = GL_RGB;
+        texture.Image_Format    = GL_RGB;
+    } else if (nrChannels == 2) {
+        texture.Internal_Format = GL_RG;
+        texture.Image_Format    = GL_RG;
+    } else if (nrChannels == 1) {
+        texture.Internal_Format = GL_RED;
+        texture.Image_Format    = GL_RED;
     }
 
     // now generate texture

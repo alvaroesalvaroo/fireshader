@@ -31,6 +31,9 @@ public:
 
     void setRotation(glm::vec3 rotationAxis, float angle);
     void setScale(glm::vec3 scale);
+
+    void setScale(float sx, float sy, float sz);
+
     glm::vec3 getPosition() {return mPosition;}
     void setShader(Shader *shader);
     void setMesh(Mesh *mesh) {mMesh = mesh;}

@@ -34,7 +34,7 @@ public:
     // retrieves a stored sader
     static Shader    &GetShader(std::string name);
     // loads (and generates) a texture from file
-    static Texture2D &LoadTexture(const char* name, const char* path, bool alpha = false);
+    static Texture2D &LoadTexture(const char* name, const char* path);
     // retrieves a stored texture
     static Texture2D &GetTexture(const char* name);
     // properly de-allocates all loaded resources
@@ -45,7 +45,7 @@ private:
     // loads and generates a shader from file
     static Shader    loadShaderFromFile(std::string vShaderFile, std::string fShaderFile, const char *gShaderFile = nullptr);
     // loads a single texture from file
-    static Texture2D loadTextureFromFile(const char *path, bool alpha);
+    static Texture2D loadTextureFromFile(const char *path);
 };
 
 #endif

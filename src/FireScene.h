@@ -14,6 +14,20 @@ class Object3D;
 class Camera3D;
 class LightEmissor;
 
+inline char const* GroundTextureFilename = "textures/rocky_gravel_diff_1k.jpg";
+inline char const* GroundNormalTextureFilename = "textures/rocky_gravel_nor_gl_1k.jpg";
+inline char const* SmokeTextureName = "textures/smokex4.png";
+inline char const* NoiseTextureName = "textures/perlin.png";
+
+inline char const* GroundMeshFilename = "mesh/CurvedPlane2.obj";
+inline char const* FlameMeshFilename = "mesh/Llama";
+inline char const* QuadFilename = "mesh/Quad.obj";
+
+inline char const* SmokeShaderName = "Smoke";
+inline char const* GroundShaderName = "NormalmapMultilit";
+
+inline char const* FlameShaderName = "Flame";
+
 class FireScene : public Scene {
 public:
     FireScene(int width, int height);

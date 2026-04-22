@@ -105,3 +105,6 @@ void Object3D::setRotation(glm::vec3 rotationAxis, float angle) {
 void Object3D::setScale(glm::vec3 scale) {
     mScale = scale;
 }
+void Object3D::setScale(float sx, float sy, float sz) {
+    mScale = glm::vec3(sx, sy, sz);
+}

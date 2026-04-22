@@ -23,19 +23,7 @@
 
 using namespace glm;
 
-char const* GroundTextureFilename = "textures/rocky_gravel_diff_1k.jpg";
-char const* GroundNormalTextureFilename = "textures/rocky_gravel_nor_gl_1k.jpg";
-char const* SmokeTextureName = "textures/smokeRGBA.png";
-char const* NoiseTextureName = "textures/perlin.png";
 
-char const* GroundMeshFilename = "mesh/CurvedPlane2.obj";
-char const* FlameMeshFilename = "mesh/Llama";
-char const* QuadFilename = "mesh/Quad.obj";
-
-char const* SmokeShaderName = "BillboardNoise";
-char const* GroundShaderName = "NormalmapMultilit";
-
-char const* FlameShaderName = "Flame";
 
 
 FireScene::FireScene(int width, int height) : ::Scene(width, height) {
@@ -119,18 +107,18 @@ void FireScene::Init() {
 
     // ==== SMOKE ===== //
     mSmoke = new Object3D();
-    mSmoke->setPosition(0.f, 0.f, 0.f);
-
+    mSmoke->setPosition(0.f, 0.25f, 0.f);
+    mSmoke->setScale(1.f, 1.5f, 1.f);
     Mesh* plane = new Mesh();
     plane->generatePlane(1);
     mSmoke->setMesh(plane);
     Shader& smokeShader = ResourceManager::LoadShader(SmokeShaderName);
     mSmoke->setShader(&smokeShader);
-    Texture2D& smokeTex = ResourceManager::LoadTexture("smoke", SmokeTextureName, true);
+    Texture2D& smokeTex = ResourceManager::LoadTexture("smoke", SmokeTextureName);
     smokeShader.SetTexture("billboardTex", true, 0);
     mSmoke->setTextureId(smokeTex.ID);
 
-    Texture2D& noiseTex = ResourceManager::LoadTexture("noise", NoiseTextureName, true);
+    Texture2D& noiseTex = ResourceManager::LoadTexture("noise", NoiseTextureName);
     smokeShader.SetTexture("noiseTex", true, 1);
     mSmoke->setSecondaryTextureId(noiseTex.ID);
     // glBindTexture(GL_TEXTURE_2D, noiseTex.ID);

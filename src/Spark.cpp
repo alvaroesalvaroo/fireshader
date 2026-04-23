@@ -26,7 +26,8 @@ void Spark::reset() {
     this->mVelocity = glm::vec3(rand() / (float)RAND_MAX, this->mVelocity.y, rand() / (float)RAND_MAX);
 
     // scale
-    float scaleFactor = 0.3f + 0.7f * rand() / (float)RAND_MAX;
+    float scaleFactor = 0.8f + 0.2f * rand() / (float)RAND_MAX;
+    // scaleFactor = 1.f;
     this->mScale = scaleFactor * glm::vec3(1.0f) * SPARKS_SIZE;
 
     // Rotation

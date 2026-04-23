@@ -40,7 +40,7 @@ FireScene::~FireScene() {
 }
 
 #define SPARKS_NUMBER 15
-#define FAKE_SPARKS_NUMBER 0
+#define FAKE_SPARKS_NUMBER 15
 
 void FireScene::Init() {
 
@@ -196,14 +196,17 @@ void FireScene::Render(float dt) {
     // -------- Smoke --------- //
     Shader& smokeShader = ResourceManager::GetShader(SmokeShaderName);
     smokeShader.Use();
+    std::vector<LightEmissor*> debugSparks = mFakeSparks;
+    int lightCount = mLights.size();
     for (int i = 0; i < mLights.size() + mFakeSparks.size(); i++) {
         std::string uniformName = "lightPositions[" + std::to_string(i) + "]";
 
-        if (i < mLights.size()) {
+        LightEmissor* lightEmissor = mLights[i];
+        if (i < lightCount) {
             smokeShader.SetVector3f(uniformName.c_str(), mLights[i]->getPosition());
         }
         else {
-            smokeShader.SetVector3f(uniformName.c_str(), mFakeSparks[i]->getPosition());
+            smokeShader.SetVector3f(uniformName.c_str(), mFakeSparks[i - lightCount]->getPosition());
         }
         // glm::vec3 lightPos = mLights[i]->getPosition();
         // glUniform3f(mLightPositionsUniforms[i], lightPos.x, lightPos.y, lightPos.z);

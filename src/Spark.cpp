@@ -11,13 +11,13 @@ Spark::Spark() {
 
 const float SPARKS_RANDOMNESS = 12.0f;
 const float SPARKS_SYSTEM_RADIUS = 0.3f;;
-
+const float SPARKS_SIZE = 0.2;
 void Spark::reset() {
     // RandomVel on Y
     this->mVelocity.y = mBaseYSpeed *( 1.3 - 0.6 * (rand() / static_cast<float>(RAND_MAX)));
 
-    this->mLifetime = 0.0f;
 
+    // Random pos on XZ
     this->mPosition = glm::vec3(rand() / static_cast<float>(RAND_MAX),
                                 -0.3,
                                 rand() / static_cast<float>(RAND_MAX))
@@ -25,6 +25,19 @@ void Spark::reset() {
 
     this->mVelocity = glm::vec3(rand() / (float)RAND_MAX, this->mVelocity.y, rand() / (float)RAND_MAX);
 
+    // scale
+    float scaleFactor = 0.3f + 0.7f * rand() / (float)RAND_MAX;
+    this->mScale = scaleFactor * glm::vec3(1.0f) * SPARKS_SIZE;
+
+    // Rotation
+    glm::vec3 randomAxis = glm::normalize(glm::vec3(
+        (float)rand() / RAND_MAX * 2.0f - 1.0f,
+        (float)rand() / RAND_MAX * 2.0f - 1.0f,
+        (float)rand() / RAND_MAX * 2.0f - 1.0f
+    ));
+    float angle = ((float)rand() / RAND_MAX) * glm::pi<float>();
+    this->mRotation = glm::angleAxis(angle, randomAxis);
+    this->mLifetime = 0.0f;
 }
 
 void Spark::update(float dt) {

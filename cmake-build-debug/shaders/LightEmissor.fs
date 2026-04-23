@@ -6,5 +6,4 @@ uniform vec3 lightColor;
 
 void main() {
 	out_color = vec4(lightColor, 1.0);
-	//out_color = vec4(1.0, 1.0, 1.0, 1.0);
 }

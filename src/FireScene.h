@@ -16,12 +16,15 @@ class LightEmissor;
 
 inline char const* GroundTextureFilename = "textures/rocky_gravel_diff_1k.jpg";
 inline char const* GroundNormalTextureFilename = "textures/rocky_gravel_nor_gl_1k.jpg";
-inline char const* SmokeTextureName = "textures/smokex4.png";
+inline char const* SmokeTextureName = "textures/smoke4.png";
 inline char const* NoiseTextureName = "textures/perlin.png";
 
+inline char const* SparkMeshFilename = "mesh/Spark.obj";
+inline char const* SparkMeshFilename2 = "mesh/Spark2.obj";
 inline char const* GroundMeshFilename = "mesh/CurvedPlane2.obj";
-inline char const* FlameMeshFilename = "mesh/Llama";
 inline char const* QuadFilename = "mesh/Quad.obj";
+// inline char const* FlameMeshFilename = "mesh/Llama";
+
 
 inline char const* SmokeShaderName = "Smoke";
 inline char const* GroundShaderName = "NormalmapMultilit";
@@ -45,7 +48,7 @@ private:
     Camera3D* mCamera;
 
     std::vector<LightEmissor*> mLights; // They will be initialized as "sparks"
-
+    std::vector<LightEmissor*> mFakeSparks;
     std::vector<int> mLightPositionsUniforms; // Optimización innecesaria
 
     Object3D* mSmoke;

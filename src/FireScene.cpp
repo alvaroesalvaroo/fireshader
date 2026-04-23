@@ -31,6 +31,7 @@ FireScene::FireScene(int width, int height) : ::Scene(width, height) {
     // mTexturedLitCube = new Object3D();
     mLightPositionsUniforms.clear();
     mLights.clear();
+    mFakeSparks.clear();
     mCamera = new Camera3D(2.f, 5.f, 45.0f);
     mGround = new Object3D();
 }
@@ -39,6 +40,7 @@ FireScene::~FireScene() {
 }
 
 #define SPARKS_NUMBER 15
+#define FAKE_SPARKS_NUMBER 0
 
 void FireScene::Init() {
 
@@ -72,15 +74,22 @@ void FireScene::Init() {
 
     litShader.SetVector3f("viewPosition", mCamera->getPosition());
 
-    // ===== SPARKS ======= //
-    Mesh* cubeMesh = new Mesh();
-    cubeMesh->createCubeMeshWithNoEBO(0.01);
+    // ===== REAL SPARKS ======= //
+
+    // Mesh* cubeMesh = new Mesh();
+    // cubeMesh->createCubeMeshWithNoEBO(0.01);
+    Mesh* sparkMesh = new Mesh();
+    sparkMesh->loadMeshFromFile(SparkMeshFilename);
+    Mesh* sparkMesh2 = new Mesh();
+    sparkMesh2->loadMeshFromFile(SparkMeshFilename2);
+
     for (int i = 0; i < SPARKS_NUMBER; i++) {
         Spark* spark = new Spark();
         mLights.push_back(spark);
-        mLights[i]->setMesh(cubeMesh);
+        mLights[i]->setMesh(sparkMesh);
     }
     Shader &emissionShader = ResourceManager::LoadShader("LightEmissor");
+
 
     // ==== SMOKE ===== //
     mSmoke = new Object3D();
@@ -120,16 +129,18 @@ void FireScene::Init() {
     }
     // Light count en los receptores!
     litShader.SetInteger("lightCount", mLights.size(), true);
-    smokeShader.SetInteger("lightCount", mLights.size(), true);
-
-    // AUX LIGHT
-    // LightEmissor* lightEmissor = new LightEmissor();
-    // LightEmissor* lightEmissor2 = new LightEmissor();
-    // mLights.push_back(lightEmissor);
-    // mLights.push_back(lightEmissor2);
+    smokeShader.SetInteger("lightCount", mLights.size() + mFakeSparks.size(), true);
 
 
-    // =============== //
+    // ====== FAKE SPARKS ===== //
+    for (int i = 0; i < FAKE_SPARKS_NUMBER; i++) {
+        Spark* fakeSpark = new Spark();
+        mFakeSparks.push_back(fakeSpark);
+        mFakeSparks[i]->setMesh(sparkMesh);
+        mFakeSparks[i]->setShader(&emissionShader);
+    }
+
+    // ====== FINAL ERROR CHECK ======= //
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
         std::cerr << "GLError initing scene: " << err << std::endl;
@@ -158,19 +169,23 @@ void FireScene::Render(float dt) {
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // glEnable(GL_DEPTH_TEST);
 
+    // -------- Lights --------- //
     for (auto light : mLights) {
         light->render(dt, mCamera);
     }
-    // gSmokeAttemp->render(dt, mCamera);
+    for (auto fakeSpark : mFakeSparks) {
+        fakeSpark->render(dt, mCamera);
+    }
 
+    // --- Update lit shader --- //
     Shader& litShader = ResourceManager::GetShader(GroundShaderName);
-
     litShader.SetVector3f("viewPosition", mCamera->getPosition(), true);
 
-    for (int i = 0; i < mLights.size(); i++) {
-        // PUede ser optimizado cacheando la uniform:
+    for (int i = 0; i < mLights.size(); i++) { // Update light positions
+        // Legacy, no optimizado
         // mLights[i]->updateLightPositionIntoShader(&litShader, i, false);
 
+        // Tiene sentido, pero no optimizado
         // std::string uniformName = "lights[" + std::to_string(i) + "].position";
         // litShader.SetVector3f(uniformName.c_str(), mLights[i]->getPosition());
 
@@ -178,28 +193,37 @@ void FireScene::Render(float dt) {
         glm::vec3 lightPos = mLights[i]->getPosition();
         glUniform3f(mLightPositionsUniforms[i], lightPos.x, lightPos.y, lightPos.z);
     }
+    // -------- Smoke --------- //
     Shader& smokeShader = ResourceManager::GetShader(SmokeShaderName);
     smokeShader.Use();
-    for (int i = 0; i < mLights.size(); i++) {
+    for (int i = 0; i < mLights.size() + mFakeSparks.size(); i++) {
         std::string uniformName = "lightPositions[" + std::to_string(i) + "]";
 
-        smokeShader.SetVector3f(uniformName.c_str(), mLights[i]->getPosition());
+        if (i < mLights.size()) {
+            smokeShader.SetVector3f(uniformName.c_str(), mLights[i]->getPosition());
+        }
+        else {
+            smokeShader.SetVector3f(uniformName.c_str(), mFakeSparks[i]->getPosition());
+        }
         // glm::vec3 lightPos = mLights[i]->getPosition();
         // glUniform3f(mLightPositionsUniforms[i], lightPos.x, lightPos.y, lightPos.z);
     }
 
+    // Actually render
+
     mGround->render(dt, mCamera);
 
-    // Billboard
-    glDepthMask(GL_FALSE);        // no escribe en depth buffer
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // Billboard optimization suggestion:
+            // glDepthMask(GL_FALSE);        // no escribe en depth buffer
+            // glEnable(GL_BLEND);
+            // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     ResourceManager::GetShader(SmokeShaderName).SetFloat("time", totalTime, true);
     mSmoke->render(dt, mCamera);
-    glDepthMask(GL_TRUE);         // restaurar
+            // glDepthMask(GL_TRUE);         // restaurar
+
 }
 
-#define PI 3.14159265
+#define π 3.14159265 // Siempre deberias tener a pi preparado si estas en C++
 
 
 void FireScene::Update(float dt) {
@@ -207,6 +231,9 @@ void FireScene::Update(float dt) {
 
     for (int i = 0; i < mLights.size(); i++) {
         mLights[i]->update(dt); // Since they are sparks, update method is overridden
+    }
+    for (int i = 0; i < mFakeSparks.size(); i++) {
+        mFakeSparks[i]->update(dt);
     }
 
     mCamera->turn(mouseDeltaX, mouseDeltaY, dt);

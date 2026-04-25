@@ -6,6 +6,7 @@
 #define FIRESCENE_H
 #include <vector>
 
+#include "PostProcessor.h"
 #include "Scene.h"
 
 
@@ -28,8 +29,8 @@ inline char const* QuadFilename = "mesh/Quad.obj";
 
 inline char const* SmokeShaderName = "Smoke";
 inline char const* GroundShaderName = "NormalmapMultilit";
-
 inline char const* FlameShaderName = "Flame";
+inline const char* DistorsionShaderName = "postprocess";
 
 class FireScene : public Scene {
 public:
@@ -51,6 +52,7 @@ private:
     std::vector<LightEmissor*> mFakeSparks;
     std::vector<int> mLightPositionsUniforms; // Optimización innecesaria
 
+    PostProcessor* mEffects;
     Object3D* mSmoke;
     Object3D* mGround;
 

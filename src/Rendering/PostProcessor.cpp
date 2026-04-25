@@ -46,6 +46,7 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
         {  0.0f,   -offset  },  // bottom-center
         {  offset, -offset  }   // bottom-right
     };
+    // Should change uniforms names
     glUniform2fv(glGetUniformLocation(this->PostProcessingShader.ID, "offsets"), 9, (float*)offsets);
     int edge_kernel[9] = {
         -1, -1, -1,
@@ -64,7 +65,7 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
 void PostProcessor::BeginRender()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, this->MSFBO);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 void PostProcessor::EndRender()
@@ -81,6 +82,7 @@ void PostProcessor::Render(double time)
     // set uniforms/options
     this->PostProcessingShader.Use();
     this->PostProcessingShader.SetFloat("time", time);
+    // Should change uniforms:
     this->PostProcessingShader.SetInteger("confuse", this->Confuse);
     this->PostProcessingShader.SetInteger("chaos", this->Chaos);
     this->PostProcessingShader.SetInteger("shake", this->Shake);

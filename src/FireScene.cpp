@@ -140,6 +140,11 @@ void FireScene::Init() {
         mFakeSparks[i]->setShader(&emissionShader);
     }
 
+    // Distorsion Effect
+
+    Shader& distortionShader = ResourceManager::LoadShader(DistorsionShaderName);
+    mEffects = new PostProcessor(distortionShader, screenWidth, screenHeight);
+    mEffects->Confuse = true;
     // ====== FINAL ERROR CHECK ======= //
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
@@ -168,6 +173,8 @@ float totalTime = 0;
 void FireScene::Render(float dt) {
     // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // glEnable(GL_DEPTH_TEST);
+
+    mEffects->BeginRender();
 
     // -------- Lights --------- //
     for (auto light : mLights) {
@@ -212,17 +219,14 @@ void FireScene::Render(float dt) {
         // glUniform3f(mLightPositionsUniforms[i], lightPos.x, lightPos.y, lightPos.z);
     }
 
-    // Actually render
-
     mGround->render(dt, mCamera);
 
-    // Billboard optimization suggestion:
-            // glDepthMask(GL_FALSE);        // no escribe en depth buffer
-            // glEnable(GL_BLEND);
-            // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     ResourceManager::GetShader(SmokeShaderName).SetFloat("time", totalTime, true);
     mSmoke->render(dt, mCamera);
-            // glDepthMask(GL_TRUE);         // restaurar
+
+    mEffects->EndRender();
+    mEffects->Render(dt);
+
 
 }
 
@@ -241,6 +245,14 @@ void FireScene::Update(float dt) {
 
     mCamera->turn(mouseDeltaX, mouseDeltaY, dt);
 }
+
+// Billboard optimization suggestion:
+// glDepthMask(GL_FALSE);        // no escribe en depth buffer
+// glEnable(GL_BLEND);
+// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+// ResourceManager::GetShader(SmokeShaderName).SetFloat("time", totalTime, true);
+// mSmoke->render(dt, mCamera);
+// glDepthMask(GL_TRUE);         // restaurar
 
 
 

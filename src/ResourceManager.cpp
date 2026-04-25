@@ -143,6 +143,10 @@ Texture2D ResourceManager::loadTextureFromFile(const char *path)
         texture.Image_Format    = GL_RED;
     }
 
+    //------ Hardocded for noise
+
+    //------
+
     // now generate texture
     texture.Generate(width, height, data);
     if (texture.ID <= 0) {

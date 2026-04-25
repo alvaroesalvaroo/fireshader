@@ -16,42 +16,47 @@ uniform sampler2D noiseTex;   // La textura de ruido (Perlin)
 uniform bool      distort;    // El interruptor para este efecto
 uniform float     time;       // El tiempo para el movimiento
 
-const float distortionStrength = 0.01;
+const float distortionStrength = 0.006;
+const float timeFactor = 0.014;
+uniform float distortionInfluence = 0.1;
+uniform vec2 worldOriginScreen;
+
+const bool debugInfluenceArea = false;
+
 void main()
 {
     vec2 finalTexCoords = TexCoords;
-    if (distort) {
-        vec2 noiseCoords = TexCoords + vec2(0.0, time * 0.01);
+    float distX = distance(TexCoords.x, worldOriginScreen.x);
+    float minY = worldOriginScreen.y - 0.1;
 
-//         2. Obtener el valor de distorsión (usamos el canal R y G)
-//         texture(noiseMap, noiseCoords).rg nos devuelve valores [0.0, 1.0]
-         vec2 distortion = texture(noiseTex, noiseCoords).rg;
-//
-//         3. Convertir a rango [-1.0, 1.0] y aplicar una fuerza pequeña (0.005)
-//         Si es muy alta, la imagen se romperá demasiado
-         finalTexCoords += (distortion * 2.0 - 1.0) * distortionStrength;
 
-        // Otra manera
-        // Scroll del noise en el tiempo para que se mueva
-//        vec2 noiseUV = TexCoords + vec2(0.0, time * 0.3);
-//        vec2 distortion = texture(noiseTex, noiseUV).rg * 2.0 - 1.0; // [-1, 1]
+    float maskX = smoothstep(distortionInfluence, distortionInfluence * 0.2, distX);
+    float maskY = smoothstep(minY, minY + 0.05, TexCoords.y);
+    float mask = maskX * maskY;
+    // Mask es 1 en el centro, 0 fuera del radio
+//    float mask = smoothstep(distortionInfluence, distortionInfluence * 0.8, dist);
 
-        // Aplicar distorsión + scroll vertical a las UVs del humo
-//        finalTexCoords.y   -= time * 0.08;           // sube
-//        finalTexCoords     += distortion * 0.06;     // se distorsiona
+    vec2 noiseCoords = TexCoords + vec2(0.0, time * timeFactor);
 
-//        color = vec4(finalTexCoords, 0, 1);
-//        color = vec4(noiseUV, 0, 1);
-//        return;
+     vec2 distortion = texture(noiseTex, noiseCoords).rg;
+     finalTexCoords.x += mask * (distortion.x * 2.0 - 1.0) * distortionStrength;
+//    color = vec4(distortion, 0, 1);
+//    return;
+//    finalTexCoords.y = TexCoords.y;
+    // Debug influence area:
+//    bool shouldDistort = (distX < distortionInfluence) && (TexCoords.y > minY);
+    if (debugInfluenceArea) {
+        color = vec4(mask, mask, mask, 1);
+        return;
     }
 
-    color = vec4(0.0f);
-    vec3 texSample[9];
     // texSample from texture offsets if using convolution matrix
 
     color =  texture(scene, finalTexCoords);
+    return;
 
     // process legacy (broken) effects
+    vec3 texSample[9];
     if (chaos)
     {
         for(int i = 0; i < 9; i++)

@@ -5,6 +5,9 @@
 #include "Camera3D.h"
 
 // Math stuff
+#include "Camera3D.h"
+#include "Camera3D.h"
+
 #include <cmath>
 #include <iostream>
 #include <ostream>
@@ -155,6 +158,10 @@ void Camera3D::updateProjectionMatrix() {
 
 void Camera3D::updateProjectionUniform(int uniformID) {
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(mProjectionMatrix));
+}
+
+glm::mat4 Camera3D::getViewProjectionProductMatrix() {
+    return mProjectionMatrix * mViewMatrix;
 }
 
 

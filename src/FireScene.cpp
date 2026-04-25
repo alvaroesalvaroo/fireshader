@@ -144,7 +144,10 @@ void FireScene::Init() {
 
     Shader& distortionShader = ResourceManager::LoadShader(DistorsionShaderName);
     mEffects = new PostProcessor(distortionShader, screenWidth, screenHeight);
-    mEffects->Confuse = true;
+    noiseTex.Bind();
+    distortionShader.SetTexture("noiseTex", true);
+    // mEffects->Confuse = true;
+    mEffects->Distort = true;
     // ====== FINAL ERROR CHECK ======= //
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
@@ -225,7 +228,21 @@ void FireScene::Render(float dt) {
     mSmoke->render(dt, mCamera);
 
     mEffects->EndRender();
-    mEffects->Render(dt);
+    // Update world origin screen
+    glm::vec4 origin = mCamera->getViewProjectionProductMatrix() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    origin /= origin.w; // Perspective divide
+    // Convertir de NDC [-1, 1] a Texture Coords [0, 1]
+    glm::vec2 screenPos = glm::vec2(origin.x, origin.y) * 0.5f + 0.5f;
+    mEffects->PostProcessingShader.SetVector2f("worldOriginScreen", screenPos, true);
+
+    const float fireRadius = 0.5f;
+    glm::vec4 edgeNDC = mCamera->getViewProjectionProductMatrix() * glm::vec4(fireRadius, 0.0f, 0.0f, 1.0f);
+    edgeNDC /= edgeNDC.w;
+    glm::vec2 edgeScreenPos = glm::vec2(edgeNDC.x, edgeNDC.y) * 0.5f + 0.5f;
+    float dynamicRadius = glm::distance(screenPos, edgeScreenPos);
+    mEffects->PostProcessingShader.SetFloat("distortionInfluence", dynamicRadius, true);
+    //
+    mEffects->Render(totalTime);
 
 
 }

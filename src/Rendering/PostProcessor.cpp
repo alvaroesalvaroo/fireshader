@@ -11,7 +11,7 @@
 #include <iostream>
 
 PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int height)
-    : PostProcessingShader(shader), Texture(), Width(width), Height(height), Confuse(false), Chaos(false), Shake(false)
+    : PostProcessingShader(shader), Texture(), Width(width), Height(height), Distort(false), Confuse(false), Chaos(false), Shake(false)
 {
     // initialize renderbuffer/framebuffer object
     glGenFramebuffers(1, &this->MSFBO);
@@ -46,7 +46,7 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
         {  0.0f,   -offset  },  // bottom-center
         {  offset, -offset  }   // bottom-right
     };
-    // Should change uniforms names
+
     glUniform2fv(glGetUniformLocation(this->PostProcessingShader.ID, "offsets"), 9, (float*)offsets);
     int edge_kernel[9] = {
         -1, -1, -1,
@@ -77,15 +77,16 @@ void PostProcessor::EndRender()
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // binds both READ and WRITE framebuffer to default framebuffer
 }
 
-void PostProcessor::Render(double time)
+void PostProcessor::Render(double totalTime)
 {
     // set uniforms/options
     this->PostProcessingShader.Use();
-    this->PostProcessingShader.SetFloat("time", time);
+    this->PostProcessingShader.SetFloat("time", static_cast<float>(totalTime));
     // Should change uniforms:
     this->PostProcessingShader.SetInteger("confuse", this->Confuse);
     this->PostProcessingShader.SetInteger("chaos", this->Chaos);
     this->PostProcessingShader.SetInteger("shake", this->Shake);
+    // this->PostProcessingShader.SetInteger("distort", this->Distort);
     // render textured quad
     glActiveTexture(GL_TEXTURE0);
     this->Texture.Bind();

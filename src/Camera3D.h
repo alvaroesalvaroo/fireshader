@@ -34,6 +34,7 @@ public:
 
     void updateProjectionUniform(int uniformID);
 
+    glm::mat4 getViewProjectionProductMatrix();
 private:
     glm::mat4	mViewMatrix;
     glm::mat4	mProjectionMatrix;

@@ -1,30 +1,34 @@
+// Billboard.vs
 #version 330 core
 
-layout (location = 0) in vec3 VertexPos0;
-layout (location = 1) in vec3 VertexPos1;
-layout (location = 2) in vec3 VertexPos2;
-layout (location = 3) in vec2 texCoor;
-layout (location = 4) in vec3 ColorVertex;
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec2 aUV;
 
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
 
-uniform float time;
+out vec2 FragTexture;
+out vec3 FragPosition;
 
-out	vec2 texFragment;
-out	vec3 colorFragment;
-
-void main(){
-
-	gl_Position = projection * view * model * vec4( VertexPos0.xyz, 1 );
-	texFragment = texCoor;
-	colorFragment = vec3(1.0, 1.0, 1.0); //ColorVertex;
-}
 
 void main() {
-    float factor = (sin(time) + 1.0) * 0.5; // Oscilación entre 0 y 1
-    vec3 interpolatedPos = mix(VertexPos0, VertexPos1, factor);
-    gl_Position = projection * view * model * vec4(interpolatedPos, 1.0);
-}
+    vec3 worldPos = vec3(model[3]);
+//    vec3 worldPos = vec3(0);
 
+    float scaleX = length(vec3(model[0]));
+    float scaleY = length(vec3(model[1]));
+
+    vec3 camRight = vec3(view[0][0], view[1][0], view[2][0]);
+    vec3 camUp    = vec3(view[0][1], view[1][1], view[2][1]);
+
+    vec3 vertexWorld = worldPos
+    + camRight * aPos.x * scaleX
+    + camUp    * aPos.y * scaleY;
+
+    gl_Position = projection * view * vec4(vertexWorld, 1.0);
+
+    FragTexture = aUV;
+    FragPosition = vertexWorld;
+}

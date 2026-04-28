@@ -129,12 +129,13 @@ void FireScene::Init() {
     mFlame->setShader(&flameShader);
     flameShader.SetTexture("billboardTex", true, 0);
     flameShader.SetTexture("noiseTex",true, 1);
+    flameShader.SetFloat("time",0);
 
     // flame2
     mFlame2 = new Object3D();
     mFlame2->setMesh(trapezium);
-    mFlame2->setPosition(glm::vec3(0.0f, 0.1f, 0.1f));
-    mFlame2->setScale(0.1f, 0.1f, 0.1f);
+    mFlame2->setPosition(glm::vec3(0.0f, 0.1f, 0.05f));
+    mFlame2->setScale(0.25f, 0.25f, 0.25f);
     mFlame2->setTextureId(flameTex.ID);
     mFlame2->setSecondaryTextureId(noiseTex2.ID);
     mFlame2->setShader(&flameShader);
@@ -174,7 +175,7 @@ void FireScene::Init() {
     noiseTex.Bind();
     distortionShader.SetTexture("noiseTex", true);
     // mEffects->Confuse = true;
-    mEffects->Distort = true;
+    mEffects->Active = true;
     // ====== FINAL ERROR CHECK ======= //
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
@@ -257,10 +258,16 @@ void FireScene::Render(float dt) {
     Shader& flameShader = ResourceManager::GetShader(FlameShaderName);
     flameShader.SetFloat("time", totalTime, true);
 
-    flameShader.SetFloat("density", 0.5, true);
+    glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    flameShader.SetFloat("density", 20);
     mFlame->render(dt, mCamera);
-    flameShader.SetFloat("density", 1, true);
-    // mFlame2->render(dt, mCamera);
+    // flameShader.SetFloat("density", 50);
+    mFlame2->render(dt, mCamera);
+    glDepthMask(GL_TRUE);
+
+
 
     mEffects->EndRender();
     // Update world origin screen

@@ -327,6 +327,40 @@ void Mesh::createCubeMeshWithEBO(float size) {
     prepareVAO(VertexLayout::PosUV);
 }
 
+void Mesh::generateTrapezium(float upSide, float downSide, float height) {
+    mArraysToDraw = 6;
+    mUseEBO = true;
+    // El stride será de 8
+
+    const int dataSize = 8 * 4 ; // Solo una cara
+    float vertices[dataSize] = {
+        // x,               y,            z,      Normals            u,     v,
+        -downSide/2, -height/2, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f,  0.0f,
+         downSide/2, -height/2, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f,  0.0f,
+         upSide/2,    height/2, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f,  1.0f,
+        -upSide/2,    height/2, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f,  1.0f,
+    };
+
+    GLuint indexData[6] =
+    {
+        // Cara frontal
+        0, 1, 2,  2, 3, 0
+    };
+
+    mVertexData.clear();
+    mIndexData.clear();
+    for (int i = 0; i < dataSize; i++) {
+        if (i % 8 < 3) { // Solo modificar x, y, z
+            mVertexData.push_back(vertices[i]);
+        } else {
+            mVertexData.push_back(vertices[i]); // Mantener normales y UVs sin cambios
+        }
+    }
+    for (unsigned int i : indexData) {
+        mIndexData.push_back(i);
+    }
+    prepareVAO(VertexLayout::PosNormalUV);
+}
 void Mesh::generatePlane(float size) {
 
     mArraysToDraw = 6;
@@ -336,10 +370,10 @@ void Mesh::generatePlane(float size) {
     const int dataSize = 8 * 4 ; // Solo una cara
     float vertices[dataSize] = {
         // x, y, z,         // Normals            // u, v,
-        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, 1.0f, 1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, 1.0f, 0.0f, 1.0f
+        -0.5f, -0.5f, 0.f,  0.0f,  0.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.f,  0.0f,  0.0f, 1.0f, 1.0f, 0.0f,
+        0.5f,  0.5f, 0.f,  0.0f,  0.0f, 1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f, 0.f,  0.0f,  0.0f, 1.0f, 0.0f, 1.0f
     };
 
     GLuint indexData[6] =

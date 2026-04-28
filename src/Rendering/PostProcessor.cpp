@@ -64,12 +64,14 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
 
 void PostProcessor::BeginRender()
 {
+    if (!Active) return;
     glBindFramebuffer(GL_FRAMEBUFFER, this->MSFBO);
     // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 void PostProcessor::EndRender()
 {
+    if (!Active) return;
     // now resolve multisampled color-buffer into intermediate FBO to store to texture
     glBindFramebuffer(GL_READ_FRAMEBUFFER, this->MSFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->FBO);
@@ -79,6 +81,8 @@ void PostProcessor::EndRender()
 
 void PostProcessor::Render(double totalTime)
 {
+    if (!Active) return;
+
     // set uniforms/options
     this->PostProcessingShader.Use();
     this->PostProcessingShader.SetFloat("time", static_cast<float>(totalTime));

@@ -19,6 +19,7 @@ inline char const* GroundTextureFilename = "textures/rocky_gravel_diff_1k.jpg";
 inline char const* GroundNormalTextureFilename = "textures/rocky_gravel_nor_gl_1k.jpg";
 inline char const* SmokeTextureName = "textures/smoke4.png";
 inline char const* NoiseTextureName = "textures/perlin.png";
+inline char const* NoiseTextureName2 = "textures/turbulence.png";
 
 inline char const* SparkMeshFilename = "mesh/Spark.obj";
 inline char const* SparkMeshFilename2 = "mesh/Spark2.obj";
@@ -45,7 +46,6 @@ public:
     void Render(float dt) override;
 
 private:
-
     Camera3D* mCamera;
 
     std::vector<LightEmissor*> mLights; // They will be initialized as "sparks"
@@ -54,6 +54,8 @@ private:
 
     PostProcessor* mEffects;
     Object3D* mSmoke;
+    Object3D* mFlame;
+    Object3D* mFlame2;
     Object3D* mGround;
 
     // TexturedLitCube* gSmokeAttemp = new TexturedLitCube();

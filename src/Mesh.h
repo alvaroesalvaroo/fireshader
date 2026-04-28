@@ -31,6 +31,8 @@ public:
     void createCubeMeshWithNoEBO(float size);
     void createCubeMeshWithEBO(float size);
 
+    void generateTrapezium(float upSide, float downSide, float height);
+
     void generatePlane(float size);
 
     void loadMeshFromFile(const char* filename);

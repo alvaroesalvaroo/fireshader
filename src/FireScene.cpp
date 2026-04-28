@@ -93,11 +93,13 @@ void FireScene::Init() {
 
     // ==== SMOKE ===== //
     mSmoke = new Object3D();
-    mSmoke->setPosition(0.f, 0.25f, 0.f);
-    mSmoke->setScale(1.f, 1.5f, 1.f);
+    mSmoke->setPosition(0.f, 0.75f, 0.f);
+    // mSmoke->setScale(2.f, 3.f, 2.f);
     Mesh* plane = new Mesh();
     plane->generatePlane(1);
-    mSmoke->setMesh(plane);
+    Mesh* trapezium = new Mesh();
+    trapezium->generateTrapezium(2, 1, 3.f);
+    mSmoke->setMesh(trapezium);
 
     Shader& smokeShader = ResourceManager::LoadShader(SmokeShaderName);
     mSmoke->setShader(&smokeShader);
@@ -111,6 +113,31 @@ void FireScene::Init() {
     mSmoke->setSecondaryTextureId(noiseTex.ID);
 
     smokeShader.SetFloat("time", 0); // Init time uniform
+
+    // ====== FLAME =========//
+    mFlame = new Object3D();
+    mFlame->setMesh(trapezium);
+    mFlame->setPosition(glm::vec3(0.0f, 0.5f, 0.1f));
+    mFlame->setScale(0.5f, 0.5f, 0.5f);
+
+    Texture2D& flameTex = ResourceManager::LoadTexture("flame", "textures/fire.png");
+    Texture2D& noiseTex2 = ResourceManager::LoadTexture("noise2", NoiseTextureName2);
+    mFlame->setTextureId(flameTex.ID);
+    mFlame->setSecondaryTextureId(noiseTex2.ID);
+
+    Shader& flameShader = ResourceManager::LoadShader("Flame");
+    mFlame->setShader(&flameShader);
+    flameShader.SetTexture("billboardTex", true, 0);
+    flameShader.SetTexture("noiseTex",true, 1);
+
+    // flame2
+    mFlame2 = new Object3D();
+    mFlame2->setMesh(trapezium);
+    mFlame2->setPosition(glm::vec3(0.0f, 0.1f, 0.1f));
+    mFlame2->setScale(0.1f, 0.1f, 0.1f);
+    mFlame2->setTextureId(flameTex.ID);
+    mFlame2->setSecondaryTextureId(noiseTex2.ID);
+    mFlame2->setShader(&flameShader);
 
     // ====== SETUP LIGHTS ====== //
     glm::vec3 lightColor = glm::vec3(1, 0.7, 0);
@@ -226,6 +253,14 @@ void FireScene::Render(float dt) {
 
     ResourceManager::GetShader(SmokeShaderName).SetFloat("time", totalTime, true);
     mSmoke->render(dt, mCamera);
+
+    Shader& flameShader = ResourceManager::GetShader(FlameShaderName);
+    flameShader.SetFloat("time", totalTime, true);
+
+    flameShader.SetFloat("density", 0.5, true);
+    mFlame->render(dt, mCamera);
+    flameShader.SetFloat("density", 1, true);
+    // mFlame2->render(dt, mCamera);
 
     mEffects->EndRender();
     // Update world origin screen

@@ -26,6 +26,8 @@ class PostProcessor
 {
 public:
     // state
+    bool Active = false;
+
     Shader PostProcessingShader;
     Texture2D Texture;
     unsigned int Width, Height;

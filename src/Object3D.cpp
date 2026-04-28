@@ -32,10 +32,10 @@ Object3D::Object3D() {
     mMesh = nullptr;
     mMaterial = nullptr;
 }
+
 Object3D::~Object3D()
 {
-    // If mesh is created here: delete mMesh;
-    mMesh = nullptr;
+    // No owners
 }
 
 // Classical transform update. Not doing anything since the goal is to become a shader master
@@ -66,6 +66,9 @@ void Object3D::render(float dt, Camera3D *camera) {
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   // Handly debug
 
     mShader->Use();
+    if (mMaterial) {
+        mMaterial->updateMaterialToShader(mShader);
+    }
     camera->updateProjectionUniform(mUniformProjection);
     camera->updateViewUniform(mUniformView);
     glActiveTexture(GL_TEXTURE0);

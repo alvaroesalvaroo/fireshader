@@ -61,6 +61,7 @@ void main() {
     for (int i = 0; i < lightCount; i++) {
         diffuseSpecularSum += calcDiffuseSpecular(lights[i], norm, viewDir, texColor);  // Sin ambient aquí
     }
+//    FragColor = vec4(texColor, 1);
     FragColor = vec4(ambient + diffuseSpecularSum, 1.0);
 
 }

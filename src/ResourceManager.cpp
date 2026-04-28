@@ -120,6 +120,7 @@ Shader ResourceManager::loadShaderFromFile(std::string vShaderFile, std::string 
 Texture2D ResourceManager::loadTextureFromFile(const char *path)
 {
     // create texture object
+    Texture2D texture;
 
     // load image
     int width, height, nrChannels;
@@ -128,7 +129,6 @@ Texture2D ResourceManager::loadTextureFromFile(const char *path)
         std::cerr<<"Error loading texture from " << path << ". Data is null" << std::endl;
     }
 
-    Texture2D texture;
     if (nrChannels == 4) {
         texture.Internal_Format = GL_RGBA;
         texture.Image_Format    = GL_RGBA;
@@ -143,9 +143,6 @@ Texture2D ResourceManager::loadTextureFromFile(const char *path)
         texture.Image_Format    = GL_RED;
     }
 
-    //------ Hardocded for noise
-
-    //------
 
     // now generate texture
     texture.Generate(width, height, data);

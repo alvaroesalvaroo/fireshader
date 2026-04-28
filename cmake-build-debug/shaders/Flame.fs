@@ -9,8 +9,8 @@ out vec4 FragColor;
 uniform sampler2D billboardTex; // The fire texture
 uniform sampler2D noiseTex;
 uniform float time;
-//uniform float brightness;
-const float brightness = 2;
+uniform float density;
+//const float brightness = 2;
 
 const float noiseSpeed = 1.87;
 const float billboardSpeed = 1;
@@ -37,7 +37,10 @@ void main() {
     alphaUV.x += 0.5;
     float alpha = texture(noiseTex, alphaUV).r; // blanco = agujero, negro = llama
 
-//    alpha *= brightness;
+    float trueDensity = mix(density, 1.0, pow(FragTexture.y, 0.3));
+    FragColor = vec4(trueDensity / 50, 0, 0, 1); // Fade
+//    return;
+    alpha *= trueDensity;
 
     // ====== FADE on the corners ======== //
     vec2 center = FragTexture - 0.5;

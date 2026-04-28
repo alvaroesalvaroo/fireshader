@@ -74,10 +74,23 @@ void FireScene::Init() {
 
     litShader.SetVector3f("viewPosition", mCamera->getPosition());
 
-    // ===== REAL SPARKS ======= //
+    // ===== LOGS (troncos) ====== //
+    mLogs = new Object3D();
+    Mesh* logsMesh = new Mesh();
+    logsMesh->loadMeshFromFile("mesh/Logs2.obj");
+    mLogs->setMesh(logsMesh);
+    mLogs->setShader(&litShader);
 
-    // Mesh* cubeMesh = new Mesh();
-    // cubeMesh->createCubeMeshWithNoEBO(0.01);
+    // textura?
+    Texture2D& logTex = ResourceManager::LoadTexture("normal", "textures/logs.jpg");
+    mLogs->setTextureId(logTex.ID);
+    mLogs->setSecondaryTextureId(logTex.ID);
+    // litShader.SetTexture("normalMap", true, 1);
+
+
+
+
+    // ===== REAL SPARKS ======= //
     Mesh* sparkMesh = new Mesh();
     sparkMesh->loadMeshFromFile(SparkMeshFilename);
     Mesh* sparkMesh2 = new Mesh();
@@ -94,9 +107,7 @@ void FireScene::Init() {
     // ==== SMOKE ===== //
     mSmoke = new Object3D();
     mSmoke->setPosition(0.f, 0.75f, 0.f);
-    // mSmoke->setScale(2.f, 3.f, 2.f);
-    Mesh* plane = new Mesh();
-    plane->generatePlane(1);
+
     Mesh* trapezium = new Mesh();
     trapezium->generateTrapezium(2, 1, 3.f);
     mSmoke->setMesh(trapezium);
@@ -120,7 +131,7 @@ void FireScene::Init() {
     mFlame->setPosition(glm::vec3(0.0f, 0.5f, 0.1f));
     mFlame->setScale(0.5f, 0.5f, 0.5f);
 
-    Texture2D& flameTex = ResourceManager::LoadTexture("flame", "textures/fire.png");
+    Texture2D& flameTex = ResourceManager::LoadTexture("flame", "textures/fire2.png");
     Texture2D& noiseTex2 = ResourceManager::LoadTexture("noise2", NoiseTextureName2);
     mFlame->setTextureId(flameTex.ID);
     mFlame->setSecondaryTextureId(noiseTex2.ID);
@@ -175,7 +186,7 @@ void FireScene::Init() {
     noiseTex.Bind();
     distortionShader.SetTexture("noiseTex", true);
     // mEffects->Confuse = true;
-    mEffects->Active = true;
+    // mEffects->Active = true;
     // ====== FINAL ERROR CHECK ======= //
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
@@ -252,6 +263,8 @@ void FireScene::Render(float dt) {
 
     mGround->render(dt, mCamera);
 
+    mLogs->render(dt, mCamera);
+
     ResourceManager::GetShader(SmokeShaderName).SetFloat("time", totalTime, true);
     mSmoke->render(dt, mCamera);
 
@@ -264,7 +277,7 @@ void FireScene::Render(float dt) {
     flameShader.SetFloat("density", 20);
     mFlame->render(dt, mCamera);
     // flameShader.SetFloat("density", 50);
-    mFlame2->render(dt, mCamera);
+    // mFlame2->render(dt, mCamera);
     glDepthMask(GL_TRUE);
 
 

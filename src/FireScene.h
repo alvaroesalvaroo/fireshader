@@ -57,6 +57,8 @@ private:
     Object3D* mFlame;
     Object3D* mFlame2;
     Object3D* mGround;
+    Object3D* mLogs;
+
 
     // TexturedLitCube* gSmokeAttemp = new TexturedLitCube();
     // NormalMapMesh* gSmoke = new NormalMapMesh();

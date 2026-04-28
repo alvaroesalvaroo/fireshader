@@ -23,11 +23,14 @@ Object3D::Object3D() {
     mPosition = glm::vec3(0.0f);
     mRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f); // identidad
     mScale = glm::vec3(1.0f);
-    mShader = nullptr;
+
     mTexture = -1;
     mTexture2 = -1;
     mUniformModel = -1;
+
+    mShader = nullptr;
     mMesh = nullptr;
+    mMaterial = nullptr;
 }
 Object3D::~Object3D()
 {

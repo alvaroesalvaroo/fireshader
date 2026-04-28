@@ -398,7 +398,10 @@ void Mesh::generatePlane(float size) {
 }
 
 void Mesh::loadMeshFromFile(const char *filename) {
+
     mUseEBO = true;
+
+    // if (strcmp(filename, "mesh/Logs.obj") == 0) mUseEBO=false;
     // For now, only OBJ files
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -518,7 +521,7 @@ void Mesh::loadMeshFromFile(const char *filename) {
 }
 
 void Mesh::prepareVAO(VertexLayout layout) {
-    std::cout << "Preparing VAO with useEBO: "<< mUseEBO << " and layout type: " << (int) layout <<std::endl;
+    // std::cout << "Preparing VAO with useEBO: "<< mUseEBO << " and layout type: " << (int) layout <<std::endl;
 
     // Create VAO
     glGenVertexArrays(1, &mVAO);

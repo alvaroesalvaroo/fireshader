@@ -11,6 +11,7 @@
 #include "gtc/type_ptr.hpp"
 #include "Shader.h"
 #include "Camera3D.h"
+#include "Material.h"
 #include "Mesh.h"
 
 
@@ -37,9 +38,10 @@ public:
     glm::vec3 getPosition() {return mPosition;}
     void setShader(Shader *shader);
     void setMesh(Mesh *mesh) {mMesh = mesh;}
-
+    void setMaterial(Material *mat) {mMaterial = mat;};
 protected:
     Mesh* mMesh;
+    Material* mMaterial;
 
     std::string mShaderName;
     GLint mTexture;

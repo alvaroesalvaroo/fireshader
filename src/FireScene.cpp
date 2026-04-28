@@ -66,7 +66,7 @@ void FireScene::Init() {
     mGround->setSecondaryTextureId(normalTex.ID); // Commenting this gives funny results
 
     // Ground material
-    Material* groundMat = new Material(0.1f, 0.8f, 0.1f);
+    Material* groundMat = new Material(0.1f, 0.8f, 0.2f);
     mGround->setMaterial(groundMat);
 
     // mat->updateMaterialToShader(&ResourceManager::GetShader(GroundShaderName));
@@ -82,16 +82,16 @@ void FireScene::Init() {
     logsMesh->loadMeshFromFile("mesh/Logs2.obj");
     mLogs->setMesh(logsMesh);
 
-    Shader& multilitMat = ResourceManager::LoadShader("MultiLitMaterial");
+    // Shader& multilitMat = ResourceManager::LoadShader("MultiLitMaterial");
     mLogs->setShader(&litShader);
 
-    Material* logsMat = new Material(1.f, 0.8f, 0.2f);
+    Material* logsMat = new Material(0.1f, 0.6f, 0.f);
     mLogs->setMaterial(logsMat);
 
     Texture2D& logTex = ResourceManager::LoadTexture("log", "textures/logs.png");
-    multilitMat.SetTexture("textura", true, 0);
     mLogs->setTextureId(logTex.ID);
-    // mLogs->setSecondaryTextureId(logTex.ID);
+    Texture2D& normalLogTex = ResourceManager::LoadTexture("normal", "textures/log-normal.jpg");
+    mLogs->setSecondaryTextureId(normalLogTex.ID);
 
     // litShader.SetTexture("normalMap", true, 1);
 
@@ -176,7 +176,7 @@ void FireScene::Init() {
     }
     // Light count en los receptores!
     litShader.SetInteger("lightCount", mLights.size(), true);
-    multilitMat.SetInteger("lightCount", mLights.size(), true);
+    // multilitMat.SetInteger("lightCount", mLights.size(), true);
     smokeShader.SetInteger("lightCount", mLights.size() + mFakeSparks.size(), true);
 
 
@@ -194,8 +194,8 @@ void FireScene::Init() {
     mEffects = new PostProcessor(distortionShader, screenWidth, screenHeight);
     noiseTex.Bind();
     distortionShader.SetTexture("noiseTex", true);
-    // mEffects->Confuse = true;
-    // mEffects->Active = true;
+
+    mEffects->Active = true;
     // ====== FINAL ERROR CHECK ======= //
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
@@ -253,12 +253,12 @@ void FireScene::Render(float dt) {
         glUniform3f(mLightPositionsUniforms[i], lightPos.x, lightPos.y, lightPos.z);
     }
     // Same as before:
-    Shader& noNormalShader = ResourceManager::GetShader("MultiLitMaterial");
-    noNormalShader.SetVector3f("viewPosition", mCamera->getPosition(), true);
-    for (int i = 0; i < mLights.size(); i++) { // Update light positions
-        glm::vec3 lightPos = mLights[i]->getPosition();
-        glUniform3f(mLightPositionsUniforms[i], lightPos.x, lightPos.y, lightPos.z);
-    }
+    // Shader& noNormalShader = ResourceManager::GetShader("MultiLitMaterial");
+    // noNormalShader.SetVector3f("viewPosition", mCamera->getPosition(), true);
+    // for (int i = 0; i < mLights.size(); i++) { // Update light positions
+    //     glm::vec3 lightPos = mLights[i]->getPosition();
+    //     glUniform3f(mLightPositionsUniforms[i], lightPos.x, lightPos.y, lightPos.z);
+    // }
 
     // -------- Smoke --------- //
     Shader& smokeShader = ResourceManager::GetShader(SmokeShaderName);

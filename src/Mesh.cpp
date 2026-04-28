@@ -464,7 +464,6 @@ void Mesh::loadMeshFromFile(const char *filename) {
     file.close();
 
     // NOW, join VertexData, NormalData and UVData
-    // Para hacerlo más efectivo, y compatible con la funcion prepareVAO
 
     size_t vertexCount = mVertexData.size() / 3;
     std::vector<GLfloat> allData;

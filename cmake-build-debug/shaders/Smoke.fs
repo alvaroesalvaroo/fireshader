@@ -16,7 +16,7 @@ uniform float time;
 const float attConstant = 0.8;
 const float attLinear = 20.0;
 const float attQuadratic = 800.0;
-const vec3 lightColor = vec3(1, 0.7, 0);
+const vec3 lightColor = vec3(1, 0.5, 0);
 // const float dyeIntensity = 0.3;
 
 const float smokeInfluence = 0.00f;
@@ -31,6 +31,7 @@ float calcAttenuationCum() {
     float attenuationCum;
     for (int i = 0; i < lightCount; i++) {
         float dist        = length(lightPositions[i] - FragPosition);
+        if (dist > 0.2) continue; // Not enough influence
         dist -= smokeInfluence;
         if (dist < 0) {
            dist = 0;
@@ -55,42 +56,18 @@ void main() {
     smokeUV     += distortion * 0.06;     // se distorsiona
 
     vec4 smoke = texture(billboardTex, smokeUV);
-
-//    FragColor = smoke;
-//    FragColor = texture(billboardTex, smokeUV);
-    //    FragColor = vec4(vec3(0.85), smoke.a * fade);
-
-
-    // ====== FADE ======== //
-    vec2 center = FragTexture - 0.5;
-    float distortionForFade = distortion.x * 0.1 + 0.4; // [-1,1] → [0.2, 0.5]
-    float fade  = 1.0 - smoothstep(0, distortionForFade, length(center)); //
-
-    // Fade lateral (X) — simétrico
-//    float fadeSides = 1.0 - smoothstep(0.2, 0.5, abs(center.x));
-//
-//    // Fade inferior más corto, superior más suave
-//    float fadeBottom = 1.0 - smoothstep(0.1, 0.4, max(0.0, -center.y)); // aplica cundo estamos en la mitad inferior
-//
-//    float distortionForFade = distortion.x * 0.1 + 0.4; // [-1,1] → [0.2, 0.5]
-//    float fadeTop    = 1.0 - smoothstep(0.1, distortionForFade, max(0.0,  center.y)); // aplica cundo estamos en la mitad superior
-//    float fade = fadeSides * fadeBottom * fadeTop;
-
-//    fade *= (distortion.x + 1) / 2;
-
-    //    FragColor = smoke;
     float smokeColor = (smoke.r + 0.3 ) /2; // Media entre gris y el color de la textura
 
+    // Light attenuation
     float att = calcAttenuationCum(); // [0, 1]
-//    att = att / 2 + att * noiseUV.x / 2;
-//    att = (distortion.x + 1)/2;
-//    att -= (distortion.x + 1 ) / 2 * 0.2; // [0, 1] - [0, 0.2]
-
-//    att = clamp(att, 0, 0.8);
-
 
     vec3 finalColor = vec3(smokeColor) * (1 - att) + lightColor * att;
 //    vec3 finalColor  = vec3(smokeColor) + dyeIntensity * lightColor  * calcAttenuationCum(); // 0.3 = intensidad del tinte
+
+    // ====== FADE EN BORDES ======== //
+    vec2 center = FragTexture - 0.5;
+    float distortionForFade = distortion.x * 0.1 + 0.4; // [-1,1] → [0.2, 0.5]
+    float fade  = 1.0 - smoothstep(0, distortionForFade, length(center)); //
 
     //FragColor = vec4(vec3(0.85), smoke.a * fade);
     FragColor = vec4(finalColor, smoke.r * fade);

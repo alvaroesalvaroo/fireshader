@@ -1,22 +1,22 @@
 
-if (NOT EXISTS "C:/Users/alv18/Documents/UOC/fireshader/cmake-build-debug/glfw/install_manifest.txt")
-  message(FATAL_ERROR "Cannot find install manifest: \"C:/Users/alv18/Documents/UOC/fireshader/cmake-build-debug/glfw/install_manifest.txt\"")
+if (NOT EXISTS "D:/Documentos/UOC/Efectos Visuales y Sonoros 2/PEC2-Fire-Shader/cmake-build-debug/glfw/install_manifest.txt")
+  message(FATAL_ERROR "Cannot find install manifest: \"D:/Documentos/UOC/Efectos Visuales y Sonoros 2/PEC2-Fire-Shader/cmake-build-debug/glfw/install_manifest.txt\"")
 endif()
 
-file(READ "C:/Users/alv18/Documents/UOC/fireshader/cmake-build-debug/glfw/install_manifest.txt" files)
+file(READ "D:/Documentos/UOC/Efectos Visuales y Sonoros 2/PEC2-Fire-Shader/cmake-build-debug/glfw/install_manifest.txt" files)
 string(REGEX REPLACE "\n" ";" files "${files}")
 
 foreach (file ${files})
   message(STATUS "Uninstalling \"$ENV{DESTDIR}${file}\"")
   if (EXISTS "$ENV{DESTDIR}${file}")
-    exec_program("C:/Program Files/JetBrains/CLion 2024.3.3/bin/cmake/win/x64/bin/cmake.exe" ARGS "-E remove \"$ENV{DESTDIR}${file}\""
+    exec_program("C:/Program Files/JetBrains/CLion 2025.2.3/bin/cmake/win/x64/bin/cmake.exe" ARGS "-E remove \"$ENV{DESTDIR}${file}\""
                  OUTPUT_VARIABLE rm_out
                  RETURN_VALUE rm_retval)
     if (NOT "${rm_retval}" STREQUAL 0)
       MESSAGE(FATAL_ERROR "Problem when removing \"$ENV{DESTDIR}${file}\"")
     endif()
   elseif (IS_SYMLINK "$ENV{DESTDIR}${file}")
-    EXEC_PROGRAM("C:/Program Files/JetBrains/CLion 2024.3.3/bin/cmake/win/x64/bin/cmake.exe" ARGS "-E remove \"$ENV{DESTDIR}${file}\""
+    EXEC_PROGRAM("C:/Program Files/JetBrains/CLion 2025.2.3/bin/cmake/win/x64/bin/cmake.exe" ARGS "-E remove \"$ENV{DESTDIR}${file}\""
                  OUTPUT_VARIABLE rm_out
                  RETURN_VALUE rm_retval)
     if (NOT "${rm_retval}" STREQUAL 0)

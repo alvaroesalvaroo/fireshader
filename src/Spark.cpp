@@ -20,7 +20,7 @@ void Spark::reset() {
 
     // Random pos on XZ
     this->mPosition = glm::vec3(rand() / static_cast<float>(RAND_MAX),
-                                -0.3,
+                                -1.5f,
                                 rand() / static_cast<float>(RAND_MAX))
                                 * SPARKS_SYSTEM_RADIUS;
 
@@ -59,12 +59,13 @@ void Spark::update(float dt) {
 
     float frameDamping = pow(mDamping, dt * 6000.0f);
 
+    this->mPosition += this->mVelocity * dt;
+
     this->mVelocity.x = this->mVelocity.x * frameDamping + this->mAcceleration.x * dt;
     // this->mVelocity.x += this->mAcceleration.x * dt;
     this->mVelocity.z = this->mVelocity.z * frameDamping + this->mAcceleration.z * dt;
     // this->mVelocity.z += this->mAcceleration.z * dt;
 
-    this->mPosition += this->mVelocity * dt;
     this->mLifetime += dt;
 
     if (this->mPosition.y > maxY) {

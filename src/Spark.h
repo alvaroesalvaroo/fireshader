@@ -25,7 +25,7 @@ public:
     float ySpeed;
 
     const float mBaseYSpeed        = 0.7f;
-    const float mNoiseStrength = 80.f;
+    const float mNoiseStrength = 800.f;
     const float mDamping       = 0.6f;
     const float maxY = 3.0f;
 

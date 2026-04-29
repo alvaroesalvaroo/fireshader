@@ -5,11 +5,12 @@
 #include "Spark.h"
 
 Spark::Spark() {
-    this->mVelocity = glm::vec3(0.0f, 0.0f, 0.0f);
+    this->mVelocity = glm::vec3(0.0f);
+    this->mAcceleration = glm::vec3(0.0f);
     reset();
 }
 
-const float SPARKS_RANDOMNESS = 12.0f;
+// const float SPARKS_RANDOMNESS = 12.0f;
 const float SPARKS_SYSTEM_RADIUS = 0.3f;;
 const float SPARKS_SIZE = 0.2;
 void Spark::reset() {
@@ -42,7 +43,6 @@ void Spark::reset() {
 }
 
 void Spark::update(float dt) {
-
     this->mAccTimer += dt;
     if (this->mAccTimer >= this->mAccUpdateRate) {
         this->mAccTimer = 0;
@@ -57,9 +57,12 @@ void Spark::update(float dt) {
         this->mAcceleration = randomAccel;
     }
 
-    this->mVelocity.x = this->mVelocity.x * mDamping + this->mAcceleration.x * dt;
-    // this->mVelocity.y = mBaseYSpeed;
-    this->mVelocity.z = this->mVelocity.z * mDamping + this->mAcceleration.z * dt;
+    float frameDamping = pow(mDamping, dt * 6000.0f);
+
+    this->mVelocity.x = this->mVelocity.x * frameDamping + this->mAcceleration.x * dt;
+    // this->mVelocity.x += this->mAcceleration.x * dt;
+    this->mVelocity.z = this->mVelocity.z * frameDamping + this->mAcceleration.z * dt;
+    // this->mVelocity.z += this->mAcceleration.z * dt;
 
     this->mPosition += this->mVelocity * dt;
     this->mLifetime += dt;

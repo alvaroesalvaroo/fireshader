@@ -43,7 +43,6 @@ set(SOURCE_FILES
         src/main.cpp
         src/Camera3D.h
         src/Camera3D.cpp
-        src/resources.rc
         glad/src/glad.c
         src/Rendering/Shader.cpp
         src/Rendering/Shader.h

@@ -5,12 +5,10 @@
 #include "Object3D.h"
 
 #include <iostream>
-#include <vector>
 #include <string>
 
 #include <glad/glad.h>
 #include "glm.hpp"
-#include "ResourceManager.h"
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
 #include "../glm/glm/gtx/string_cast.hpp"

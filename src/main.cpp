@@ -30,9 +30,9 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 GLFWwindow* gWindow;
 
 // The Width of the screen
-const unsigned int SCREEN_WIDTH = 1920;
+const unsigned int SCREEN_WIDTH = 1000;
 // The height of the screen
-const unsigned int SCREEN_HEIGHT = 1080;
+const unsigned int SCREEN_HEIGHT = 800;
 
 TextRenderer* textRenderer;
 std::string statsText = "FPS: 0";
@@ -186,7 +186,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 
 }
-float lastX = 400, lastY = 300;
+float lastX = SCREEN_WIDTH / 2.f, lastY = SCREEN_HEIGHT / 2.f;
 bool firstMouse = true;
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
@@ -204,6 +204,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
 
     lastX = xpos;
     lastY = ypos;
+    // std::cout << Scene::CurrentScene->mouseDeltaX << ", " << Scene::CurrentScene->mouseDeltaY  << std::endl;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

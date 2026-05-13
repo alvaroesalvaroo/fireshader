@@ -1,24 +1,38 @@
-# Low-Level Bricks
+# Fire Shader
 
-ESTE DOCUMENTO ESTÁ OPTIMIZADO PARA VISUALIZARSE EN EL [REPOSITORIO DE GITLAB](https://gitlab.com/aruizgarcia14/pgpec3-a-game-in-c-with-opengl)
+En esta práctica, experimentaremos con el uso de diferentes shaders para crear una escena 3D con un fuego.
 
-A high-performance, local multiplayer arcade game built with C++ and OpenGL. Based on the classic Breakout mechanics from the [Joey de Vries (LearnOpenGL) tutorial](https://learnopengl.com/In-Practice/2D-Game/Breakout), this version has been extended to support a 2-player mode.
+El resultado final incluye partículas (_point lights_), humo, llamas y un efecto de post-procesado que simula la distorsión por efecto del calor.
 
-![Game demo](./media/LowLevelBricksDemo.mp4)
+![Fire demo scene](./media/FireDemo.mp4)
 
-## Code
+## Clases y organización del código
 
-Main classes in [src/](src/) folder are categorized as follows:
+Para evitar el desastre de intentos anteriores con OpenGL, esta vez decidí adoptar una estructura de clases basada en el tutorial de [Breakout por Joey de Vrie](https://learnopengl.com/In-Practice/2D-Game/Breakout), aunque adaptada al entorno 3D. También decidí centralizar la mayoría de la lógica del _setup_ en la clase **FireScene** 
 
-- **Rendering:** here we include _Shader_, _Texture_, _SpriteRenderer_, _TextRenderer_, and _PostProcessor_ classes.
-- **GameObjects:** a basic _GameObject_ hierarchy, including _BallObject_, _Particle_ and _PowerUp_.
-- **GameLogic:** here we include the interface _Scene_, implemented by _Game_ and _TwoPlayersGame_ classes. Also classes _GameLevel_ and _TwoPlayersLevel_ are included here.
-- **AudioEngine:** was implemented using SDL_mixer. It is worth mentioning that we decided to include a quick cooldown (~50ms) so that the same sound is not reproduced too many times repeatedly. This avoids having an annoying sound when multiple collision are detected continuously (which happens quite often).
+Las siguientes clases son en su gran mayoría recicladas:
 
-I finally decided to use inheritance in order to implement a 2-player variation of the game. This required refactoring the base _Game_ class into more granular methods to allow for overrides. I think it was a good practical decission to make the fewer possible variations, although Game class may have too many methods.
+- **Shader**: clase que permite crear y compilar los shaders, mostrando errores de compilación si existen. También permite asignar _uniforms_ por nombre.
+- **Texture:** permite dar el formato correcto a las texturas, además de _bindearlas_ al bus adecuado de datos.
+- **Resource Manager:** permite cargar desde la memoria los Shaders y Texturas. Centraliza la liberación de recursos.
 
-- Game Class: Acts as the base engine, handling the main loop, resource management, and collision logic.
-- TwoPlayersGame Class: Inherits from Game. Makes variations to the methods of Game that references to Ball, Player, Lives or Particles, making it double. Also has a different logic to win the game.
+Por otro lado, decidí añadir las siguientes clases:
+
+- **Mesh**: prepara los arrays de datos VAO, VBO y EBO al crear la malla. Tiene funciones que permiten crear mallas básicas como `generateTrapezium`, `generatePlane`, `generateCubeWithNormals`, ... También tiene un loader de mallas en formato .obj que creé yo mismo.
+Además, su método `draw()` llama `glBindVertexArray` y a `glDrawArrays` o `glDrawElements` según corresponda. 
+- **Material**: modelo simple de material (ambient, diffuse, specular y shininess). Hemos decidido que no gestione la textura, simplemente actualiza estos parámetros en el shader pertinente.
+- **Object3D**: gestiona la posición, rotación y escala del objeto Tiene posibles referencias a una **malla**, un **material**, un **shader** y hasta **dos texturas** (no necesité más de 2 texturas en ningún objeto, aunque la generalización hubiera sido trivial).
+También guarda las uniforms id de Model, Projection y View para actualizarlas de manera optimizada en el `render()`.
+
+## Shaders
+
+Para conseguir el efecto final de fuego, hemos usado los siguientes shaders:
+- **NormalMapMultilit**: shader del suelo. Recibe iluminación de diversas _point lights_. La iluminación está basada en el modelo ambient-diffuse-specular. Para los normalmaps, se hace uso de un pequeño truco para no tener que calcular la matriz TBN (tangent, bitangent, normal): se asume que la mayoría de polígonos están en el plano XZ, y se colocan los vectores de acuerdo a esta posición `norm = normalize(vec3(norm.x, norm.z, norm.y))`
+- **Smoke**
+- **LightEmissor**
+- **Fire**
+- **Postprocess**
+
 
 ## Dependencies
 When making the build, three `.dll` files should be placed in the same directory as the executable: Freetype, SDL and SDL_mixer. For Windows OS, these can be found in:

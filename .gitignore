@@ -9,7 +9,7 @@ cmake-build-debug/*.dll
 cmake-build-debug/*.ninja*
 cmake-build-debug/*.cmake
 cmake-build-debug/*.txt
-cmake-build-debug/glfw/*
+cmake-build-debug/glfw/
 
 #src3DOldProject/
 .vs/

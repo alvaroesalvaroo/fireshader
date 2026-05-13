@@ -19,14 +19,14 @@ class Object3D {
 public:
     Object3D();
     virtual ~Object3D();
-    // int loadTextureFromFile(char const* filename);
+
     void setTextureId(int textureId) {mTexture = textureId;}
     void setSecondaryTextureId(int textureId2) {mTexture2 = textureId2;}
 
-    virtual void render(float dt, Camera3D *camera);
+    void render(float dt, Camera3D *camera);
 
     virtual void update(float dt); // The goal is not to use it (very much)
-    virtual void setPosition(glm::vec3 position);
+    void setPosition(glm::vec3 position);
 
     void setPosition(float px, float py, float pz);
 
@@ -42,14 +42,10 @@ public:
 protected:
     Mesh* mMesh;
     Material* mMaterial;
+    Shader* mShader;
 
-    std::string mShaderName;
     GLint mTexture;
     GLint mTexture2;
-    // int mTextureIndex;
-    // bool mIsTransparent;
-
-    Shader* mShader;
 
     GLint mUniformModel;
     GLint mUniformProjection;
@@ -57,8 +53,6 @@ protected:
 
     glm::vec3 mPosition;
     glm::quat mRotation;
-    // glm::vec3 mRotationAxis;
-    // float mRotationAngle;
     glm::vec3 mScale;
 
 };

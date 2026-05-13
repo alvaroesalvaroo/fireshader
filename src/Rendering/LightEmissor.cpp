@@ -1,31 +1,8 @@
-//
-// Created by alv18 on 04/05/2025.
-//
 
 #include "LightEmissor.h"
 
 #include <iostream>
 #include <ostream>
-
-#include "Camera3D.h"
-#include "Camera3D.h"
-
-// void LightEmissor::initEmissionShader() {
-//     // This method init a object who already has a  mShaderName
-//
-//     Object3D::setShader(TODO);
-//     mShader->Use();
-//
-//     // Color for single light
-//
-//     mLightColorUniform = glGetUniformLocation(mShader->getID(), "lightColor");
-//     GLenum err = glGetError();
-//     if (mLightColorUniform == -1) {
-//         std::cerr << "Uniform lightColor not found in " << mShaderName << std::endl;
-//     }
-//     glUniform3f(mLightColorUniform, mPointLight.color.x, mPointLight.color.y, mPointLight.color.z);
-//
-// }
 
 void LightEmissor::initLightUniformIntoShader(Shader* shader, bool useShader) {
     if (useShader) shader->Use();

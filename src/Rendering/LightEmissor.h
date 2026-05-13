@@ -1,6 +1,3 @@
-//
-// Created by alv18 on 04/05/2025.
-//
 
 #ifndef LIGHTEMISSORCUBE_H
 #define LIGHTEMISSORCUBE_H
